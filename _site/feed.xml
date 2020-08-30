@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.0">Jekyll</generator><link href="https://kbairak.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://kbairak.github.io/" rel="alternate" type="text/html" /><updated>2020-08-29T15:24:56+03:00</updated><id>https://kbairak.github.io/feed.xml</id><title type="html">kbairak’s blog</title><subtitle>Mostly programming tips and tutorials, mostly in Python. But who knows? I may rumble about other things as well.</subtitle><entry><title type="html">How to properly make list-like objects in Python</title><link href="https://kbairak.github.io/programming/python/2020/08/29/how-to-make-list-like-objects-in-python.html" rel="alternate" type="text/html" title="How to properly make list-like objects in Python" /><published>2020-08-29T15:00:00+03:00</published><updated>2020-08-29T15:00:00+03:00</updated><id>https://kbairak.github.io/programming/python/2020/08/29/how-to-make-list-like-objects-in-python</id><content type="html" xml:base="https://kbairak.github.io/programming/python/2020/08/29/how-to-make-list-like-objects-in-python.html">&lt;p&gt;In this post we will be talking about how Python likes to deal with “list-like
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.0">Jekyll</generator><link href="https://kbairak.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://kbairak.github.io/" rel="alternate" type="text/html" /><updated>2020-08-30T16:07:01+03:00</updated><id>https://kbairak.github.io/feed.xml</id><title type="html">kbairak’s blog</title><subtitle>Mostly programming tips and tutorials, mostly in Python. But who knows? I may rumble about other things as well.</subtitle><entry><title type="html">How to properly make list-like objects in Python</title><link href="https://kbairak.github.io/programming/python/2020/08/29/how-to-make-list-like-objects-in-python.html" rel="alternate" type="text/html" title="How to properly make list-like objects in Python" /><published>2020-08-29T15:00:00+03:00</published><updated>2020-08-29T15:00:00+03:00</updated><id>https://kbairak.github.io/programming/python/2020/08/29/how-to-make-list-like-objects-in-python</id><content type="html" xml:base="https://kbairak.github.io/programming/python/2020/08/29/how-to-make-list-like-objects-in-python.html">&lt;p&gt;In this post we will be talking about how Python likes to deal with “list-like
 objects”. We will be diving into some quirks of Python that might seem a bit
 weird and, in the end, hopefully teach you how to build something that could
 actually be useful while avoiding common mistakes.&lt;/p&gt;
@@ -32,7 +32,7 @@ actually be useful while avoiding common mistakes.&lt;/p&gt;
 &lt;p&gt;A lot of people will be familiar with this:&lt;/p&gt;
 
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;# 'three'
+&lt;span class=&quot;c1&quot;&gt;# &amp;lt;&amp;lt;&amp;lt; 'three'
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;__getitem__&lt;/code&gt; is the method you override if you want your instances to respond
@@ -52,15 +52,15 @@ to the square bracket notation. Essentially &lt;code class=&quot;language-plaint
 # 6 six
 &lt;/span&gt;
 &lt;span class=&quot;nb&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;# ['zero', 'one', 'two', 'three', 'four', 'five', 'six']
+&lt;span class=&quot;c1&quot;&gt;# &amp;lt;&amp;lt;&amp;lt; ['zero', 'one', 'two', 'three', 'four', 'five', 'six']
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;or this:&lt;/p&gt;
 
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;s&quot;&gt;'three'&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;# True
+&lt;span class=&quot;c1&quot;&gt;# &amp;lt;&amp;lt;&amp;lt; True
 &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'apple'&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;# False
+&lt;span class=&quot;c1&quot;&gt;# &amp;lt;&amp;lt;&amp;lt; False
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;Before I explain what I &lt;em&gt;think&lt;/em&gt; is going on, lets try to tweak the snippet to
@@ -93,13 +93,13 @@ see how it reacts:&lt;/p&gt;
 &lt;p&gt;Although this would be a reasonable outcome:&lt;/p&gt;
 
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;# ['zero', 'one', 'two', 'three', 'five', 'six']  # wrong
+&lt;span class=&quot;c1&quot;&gt;# &amp;lt;&amp;lt;&amp;lt; ['zero', 'one', 'two', 'three', 'five', 'six']  # wrong
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;It turns out that the actual result is this:&lt;/p&gt;
 
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;# ['zero', 'one', 'two', 'three']
+&lt;span class=&quot;c1&quot;&gt;# &amp;lt;&amp;lt;&amp;lt; ['zero', 'one', 'two', 'three']
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;Lets try another tweak now:&lt;/p&gt;
@@ -227,13 +227,18 @@ but it looks like it has yet another trick up its sleeve:&lt;/p&gt;
   &lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;p&gt;This explains all our examples. When we removed the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;elif index == 4&lt;/code&gt; part, it
-went straight to the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;IndexError&lt;/code&gt; and stopped the iteration. When we removed
-the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;raise IndexError(index)&lt;/code&gt; part, it went to the end of the body of the
-method, which in Python means that the method returns &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;None&lt;/code&gt;; &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;None&lt;/code&gt; is a
-perfectly acceptable value for &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;__getitem__&lt;/code&gt; to return, so the iteration went
-on. When we injected a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;3 / 0&lt;/code&gt; somewhere, it raised a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ZeroDivisionError&lt;/code&gt; in
-the middle of the iteration.&lt;/p&gt;
+&lt;p&gt;This explains all our examples:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;When we removed the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;elif index == 4&lt;/code&gt; part, it went straight to the
+&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;IndexError&lt;/code&gt; and stopped the iteration&lt;/li&gt;
+  &lt;li&gt;When we removed the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;raise IndexError(index)&lt;/code&gt; part, it went to the end of the
+body of the method, which in Python means that the method returns &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;None&lt;/code&gt;;
+&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;None&lt;/code&gt; is a perfectly acceptable value for &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;__getitem__&lt;/code&gt; to return, so the
+iteration went on forever&lt;/li&gt;
+  &lt;li&gt;When we injected a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;3 / 0&lt;/code&gt; somewhere, it raised a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ZeroDivisionError&lt;/code&gt; in the
+middle of the iteration&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;p&gt;Lets now revert to our first example, the “correct” one, and try throwing some
 more curveballs at it:&lt;/p&gt;
@@ -250,9 +255,10 @@ would simply have to try an iteration and count how many steps it took to reach
 an &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;IndexError&lt;/code&gt;. But it doesn’t. It probably makes sense since iterable
 sequences may also be infinite sequences and Python would get stuck. The fact
 that &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;reversed()&lt;/code&gt; doesn’t work wasn’t surprizing, especially since &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;len()&lt;/code&gt;
-didn’t work.  How would Python know where to start? In fact, Python complains
-for the missing &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;len()&lt;/code&gt; of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;FakeList&lt;/code&gt;, not &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;reversed()&lt;/code&gt;. But it seems that we
-can fix both problems by adding &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;len()&lt;/code&gt; to our &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;FakeList&lt;/code&gt;:&lt;/p&gt;
+didn’t work.  How would Python know where to start? In fact, when we called
+&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;reversed()&lt;/code&gt;, Python complained about the missing &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;len()&lt;/code&gt; of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;FakeList&lt;/code&gt;, not
+&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;reversed()&lt;/code&gt;. But it seems that we can fix both problems by adding &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;len()&lt;/code&gt; to
+our &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;FakeList&lt;/code&gt;:&lt;/p&gt;
 
 &lt;div class=&quot;language-diff highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; class FakeList:
      def __getitem__(self, index):
@@ -279,10 +285,10 @@ can fix both problems by adding &lt;code class=&quot;language-plaintext highligh
 
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;FakeList&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
 &lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;# 7
+&lt;span class=&quot;c1&quot;&gt;# &amp;lt;&amp;lt;&amp;lt; 7
 &lt;/span&gt;
 &lt;span class=&quot;nb&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;reversed&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;# ['six', 'five', 'four', 'three', 'two', 'one', 'zero']
+&lt;span class=&quot;c1&quot;&gt;# &amp;lt;&amp;lt;&amp;lt; ['six', 'five', 'four', 'three', 'two', 'one', 'zero']
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;So, to sum up. What can we do with our &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;FakeList&lt;/code&gt; object?&lt;/p&gt;
@@ -322,7 +328,7 @@ an instance of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&g
 
 &lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;collections.abc&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Sized&lt;/span&gt;
 &lt;span class=&quot;nb&quot;&gt;isinstance&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;NotSized&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Sized&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;# True
+&lt;span class=&quot;c1&quot;&gt;# &amp;lt;&amp;lt;&amp;lt; True
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;You can write your own ABCs, and the theory behind why they are needed and how
@@ -402,18 +408,38 @@ test:&lt;/p&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'two'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;# 2
+&lt;span class=&quot;c1&quot;&gt;# &amp;lt;&amp;lt;&amp;lt; 2
 &lt;/span&gt;
 &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;count&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'two'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;# 1
+&lt;span class=&quot;c1&quot;&gt;# &amp;lt;&amp;lt;&amp;lt; 1
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;So the bottom line of all this is:&lt;/p&gt;
 
 &lt;blockquote&gt;
-  &lt;p&gt;If you want to make something that can be “officially” considered a readable
+  &lt;p&gt;&lt;strong&gt;If you want to make something that can be “officially” considered a readable
 list-like object in Python, make it subclass &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Sequence&lt;/code&gt; and implement at
-least the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;__getitem__&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;__len__&lt;/code&gt; methods&lt;/p&gt;
+least the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;__getitem__&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;__len__&lt;/code&gt; methods&lt;/strong&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;The same conclusion holds true for all the ABCs listed in the
+&lt;a href=&quot;https://docs.python.org/3/library/collections.abc.html&quot;&gt;documentation&lt;/a&gt;. For example, if you want to make a fully
+legitimate read-&lt;strong&gt;write&lt;/strong&gt; list-like object, you would simply have to subclass
+from &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;MutableSequence&lt;/code&gt; and implement the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;__getitem__&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;__len__&lt;/code&gt;,
+&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;__setitem__&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;__detitem__&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;insert&lt;/code&gt; methods (the ones in the ‘Abstract
+methods’ column).&lt;/p&gt;
+
+&lt;p&gt;There is a note in the &lt;a href=&quot;https://docs.python.org/3/library/collections.abc.html&quot;&gt;documentation&lt;/a&gt; which is
+interesting, so we are going to include it here verbatim:&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Implementation note: Some of the mixin methods, such as &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;__iter__()&lt;/code&gt;,
+&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;__reversed__()&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;index()&lt;/code&gt;, make repeated calls to the underlying
+&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;__getitem__()&lt;/code&gt; method. Consequently, if &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;__getitem__()&lt;/code&gt; is implemented with
+constant access speed, the mixin methods will have linear performance;
+however, if the underlying method is linear (as it would be with a linked
+list), the mixins will have quadratic performance and will likely need to be
+overridden.&lt;/p&gt;
 &lt;/blockquote&gt;
 
 &lt;h1 id=&quot;part-3-chainable-methods&quot;&gt;Part 3: Chainable methods&lt;/h1&gt;
@@ -436,7 +462,7 @@ everything will come together in the end. Lets make another useless class.&lt;/p
 &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;increment&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
 &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;increment&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
 &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;# &amp;lt;Counter: 3&amp;gt;
+&lt;span class=&quot;c1&quot;&gt;# &amp;lt;&amp;lt;&amp;lt; &amp;lt;Counter: 3&amp;gt;
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;Nothing surprising here.&lt;/p&gt;
@@ -446,7 +472,7 @@ could do:&lt;/p&gt;
 
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Counter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;increment&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;increment&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;increment&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
 &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;# &amp;lt;Counter: 3&amp;gt;
+&lt;span class=&quot;c1&quot;&gt;# &amp;lt;&amp;lt;&amp;lt; &amp;lt;Counter: 3&amp;gt;
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;The easiest way to accomplish this is to have &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.increment()&lt;/code&gt; return the
@@ -535,15 +561,17 @@ a slightly mutated copy of &lt;code class=&quot;language-plaintext highlighter-r
 
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;c1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Counter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;increment&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
 &lt;span class=&quot;n&quot;&gt;c2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;increment&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;c1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c2&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;# (&amp;lt;Counter: 2&amp;gt;, &amp;lt;Counter: 2&amp;gt;)
-&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;c1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c2&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;# True
+
+&lt;span class=&quot;n&quot;&gt;c1&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;# &amp;lt;&amp;lt;&amp;lt; &amp;lt;Counter: 2&amp;gt;
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c2&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;# &amp;lt;&amp;lt;&amp;lt; &amp;lt;Counter: 2&amp;gt;
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c2&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;# &amp;lt;&amp;lt;&amp;lt; True
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;Someone not familiar with the implementation of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Counter&lt;/code&gt; would assume that
-&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;c1&lt;/code&gt; would have the value &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;1&lt;/code&gt;.&lt;/p&gt;
+&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;c1&lt;/code&gt; would hold the value &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;1&lt;/code&gt;.&lt;/p&gt;
 
 &lt;p&gt;How do we &lt;em&gt;fix&lt;/em&gt; this? My suggestion is: make the class’s initializer accept any
 optional arguments required to fully describe the instance’s state. Then,
@@ -569,11 +597,13 @@ changed, state.&lt;/p&gt;
 
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;c1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Counter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;increment&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
 &lt;span class=&quot;n&quot;&gt;c2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;increment&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;c1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c2&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;# (&amp;lt;Counter: 1&amp;gt;, &amp;lt;Counter: 2&amp;gt;)
-&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;c1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c2&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;# False
+
+&lt;span class=&quot;n&quot;&gt;c1&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;# &amp;lt;&amp;lt;&amp;lt; &amp;lt;Counter: 1&amp;gt;
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c2&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;# &amp;lt;&amp;lt;&amp;lt; &amp;lt;Counter: 2&amp;gt;
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c2&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;# &amp;lt;&amp;lt;&amp;lt; False
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;It might be a little better if we also do this:&lt;/p&gt;
@@ -615,10 +645,11 @@ access the responses like lists. We are going to use the
         &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
         &lt;span class=&quot;n&quot;&gt;response&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;raise_for_status&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
         &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;response&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;json&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'data'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;span class=&quot;n&quot;&gt;organizations&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TxCollection&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/organizations&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;organizations&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TxCollection&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/organizations&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 &lt;span class=&quot;n&quot;&gt;organizations&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'attributes'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'name'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;# 'kb_org'
+&lt;span class=&quot;c1&quot;&gt;# &amp;lt;&amp;lt;&amp;lt; 'diegobz'
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;Now lets make this behave like a list:&lt;/p&gt;
@@ -655,17 +686,17 @@ access the responses like lists. We are going to use the
 
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;organizations&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TxCollection&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/organizations&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 &lt;span class=&quot;n&quot;&gt;organizations&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;# &amp;lt;TxCollection (3): 'o:diegobz', 'o:kb_org', 'o:transifex'&amp;gt;
+&lt;span class=&quot;c1&quot;&gt;# &amp;lt;&amp;lt;&amp;lt; &amp;lt;TxCollection (3): 'o:diegobz', 'o:kb_org', 'o:transifex'&amp;gt;
 &lt;/span&gt;
 &lt;span class=&quot;n&quot;&gt;organizations&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;# {'id': 'o:transifex',
-#  'type': 'organizations',
-#  'attributes': {
-#   'name': 'Transifex',
-#   'slug': 'transifex',
-#   'logo_url': 'https://txc-assets-775662142440-prod.s3.amazonaws.com/mugshots/435381b2e0.jpg',
-#   'private': False},
-#  'links': {'self': 'https://rest.api.transifex.com/organizations/o:transifex'}}
+&lt;span class=&quot;c1&quot;&gt;# &amp;lt;&amp;lt;&amp;lt; {'id': 'o:transifex',
+# ...  'type': 'organizations',
+# ...  'attributes': {
+# ...   'name': 'Transifex',
+# ...   'slug': 'transifex',
+# ...   'logo_url': 'https://txc-assets-775662142440-prod.s3.amazonaws.com/mugshots/435381b2e0.jpg',
+# ...   'private': False},
+# ...  'links': {'self': 'https://rest.api.transifex.com/organizations/o:transifex'}}
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;What is interesting here is that we &lt;em&gt;know&lt;/em&gt; that our class is a legitimate
@@ -714,6 +745,11 @@ collections lazy:&lt;/p&gt;
          return result
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;organizations&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TxCollection&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/organizations&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;organizations&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;# &amp;lt;&amp;lt;&amp;lt; &amp;lt;TxCollection (3): 'o:diegobz', 'o:kb_org', 'o:transifex'&amp;gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
 &lt;p&gt;Our &lt;em&gt;lazy&lt;/em&gt; evaluation:&lt;/p&gt;
 
 &lt;ol&gt;
@@ -721,21 +757,22 @@ collections lazy:&lt;/p&gt;
   &lt;li&gt;Will abort early if the collection has already been evaluated&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;p&gt;To drive point 1 home, I will point out that our &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;__repr__&lt;/code&gt; method does &lt;strong&gt;not&lt;/strong&gt;
-explicitly trigger an evaluation, but triggers it nevertheless. The
-&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;for item in self&lt;/code&gt; part in its first line will start an iteration, which will
-call &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;__getitem__&lt;/code&gt; (as we saw in &lt;em&gt;Part 1&lt;/em&gt;), which will trigger the evaluation.
-Even if it didn’t, the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;len(self)&lt;/code&gt; part in the second line would also trigger
-the evaluation.&lt;/p&gt;
+&lt;p&gt;To drive point 1 home, I will point out that our &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;__repr__&lt;/code&gt; method (the one
+that was called when we typed &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;organizations &amp;lt;ENTER&amp;gt;&lt;/code&gt; into our python terminal)
+does &lt;strong&gt;not&lt;/strong&gt; explicitly trigger an evaluation, but triggers it nevertheless.
+The &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;for item in self&lt;/code&gt; part in its first line will start an iteration, which
+will call &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;__getitem__&lt;/code&gt; (as we saw in &lt;em&gt;Part 1&lt;/em&gt;), which will trigger the
+evaluation.  Even if it didn’t, the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;len(self)&lt;/code&gt; part in the second line would
+also trigger the evaluation.&lt;/p&gt;
 
 &lt;p&gt;Playing with metaprogramming, which in this context means making things behave
 like things that they are not, can be tricky, dangerous and cause bugs, as
-anyone who has played with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;__getattr__&lt;/code&gt; and ran into &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;RecursionError&lt;/code&gt;s can
+anyone who has played with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;__setattr__&lt;/code&gt; and ran into &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;RecursionError&lt;/code&gt;s can
 attest to. This is the beauty of the conclusion from &lt;em&gt;Part 2&lt;/em&gt;: we want to make
 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;TxCollection&lt;/code&gt; behave like a list and we know &lt;strong&gt;exactly&lt;/strong&gt; which parts of the
 code trigger that behaviour: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;__getitem__&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;__len__&lt;/code&gt;. That’s the &lt;strong&gt;only&lt;/strong&gt;
-parts we need to add our custom evaluation to in order to be 100% confident
-that &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;TxCollection&lt;/code&gt; will properly behave like a readable list.&lt;/p&gt;
+parts we need to add our lazy evaluation to in order to be 100% confident that
+&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;TxCollection&lt;/code&gt; will properly behave like a readable list.&lt;/p&gt;
 
 &lt;p&gt;Now lets apply filtering. We will intentionally do it the &lt;em&gt;wrong&lt;/em&gt; way, by
 returning &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;self&lt;/code&gt;, so that we can see the flaws outlined in &lt;em&gt;Part 3&lt;/em&gt; in the
@@ -774,9 +811,9 @@ context of this example. Then we will fix it.&lt;/p&gt;
 
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;TxCollection&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/resource_translations&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;\
     &lt;span class=&quot;nb&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;resource&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;o:kb_org:p:kb1:r:fileless&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;language&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;l:el&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;# &amp;lt;TxCollection (3): 'o:kb_org:p:k...72e4fdb0:l:el',
-#                    'o:kb_org:p:k...e877d7ee:l:el',
-#                    'o:kb_org:p:k...ed953f8f:l:el'&amp;gt;
+&lt;span class=&quot;c1&quot;&gt;# &amp;lt;&amp;lt;&amp;lt; &amp;lt;TxCollection (3): 'o:kb_org:p:k...72e4fdb0:l:el',
+# ...                    'o:kb_org:p:k...e877d7ee:l:el',
+# ...                    'o:kb_org:p:k...ed953f8f:l:el'&amp;gt;
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;em&gt;(Note: There are some Transifex-API-v3-specific things here, like how
@@ -789,19 +826,35 @@ documentation&lt;/a&gt;)&lt;/em&gt;&lt;/p&gt;
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;c1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TxCollection&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/resource_translations&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;\
     &lt;span class=&quot;nb&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;resource&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;o:kb_org:p:kb1:r:fileless&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;language&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;l:el&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 &lt;span class=&quot;n&quot;&gt;c2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;translated&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;true&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c2&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;# (1, 1, True)
+
+&lt;span class=&quot;n&quot;&gt;c1&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;# &amp;lt;&amp;lt;&amp;lt; &amp;lt;TxCollection (1): 'o:kb_org:p:k...72e4fdb0:l:el'&amp;gt;
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c2&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;# &amp;lt;&amp;lt;&amp;lt; &amp;lt;TxCollection (1): 'o:kb_org:p:k...72e4fdb0:l:el'&amp;gt;
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c2&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;# &amp;lt;&amp;lt;&amp;lt; True
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;We know from our previous run that &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;c1&lt;/code&gt; should have a size of 3, but it got
-overwritten when we applied &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.filter()&lt;/code&gt; to it. Also,&lt;/p&gt;
+overwritten when we applied &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.filter()&lt;/code&gt; to it.&lt;/p&gt;
+
+&lt;p&gt;Also,&lt;/p&gt;
 
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;c1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TxCollection&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/resource_translations&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;\
     &lt;span class=&quot;nb&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;resource&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;o:kb_org:p:kb1:r:fileless&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;language&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;l:el&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 &lt;span class=&quot;n&quot;&gt;_&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 &lt;span class=&quot;n&quot;&gt;c2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;translated&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;true&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c2&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;# (3, 3, True)
+
+&lt;span class=&quot;n&quot;&gt;c1&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;# &amp;lt;&amp;lt;&amp;lt; &amp;lt;TxCollection (3): 'o:kb_org:p:k...72e4fdb0:l:el',
+# ...                    'o:kb_org:p:k...e877d7ee:l:el',
+# ...                    'o:kb_org:p:k...ed953f8f:l:el'&amp;gt;
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c2&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;# &amp;lt;&amp;lt;&amp;lt; &amp;lt;TxCollection (3): 'o:kb_org:p:k...72e4fdb0:l:el',
+# ...                    'o:kb_org:p:k...e877d7ee:l:el',
+# ...                    'o:kb_org:p:k...ed953f8f:l:el'&amp;gt;
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c2&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;# &amp;lt;&amp;lt;&amp;lt; True
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;We forced an evaluation &lt;strong&gt;before&lt;/strong&gt; we applied the second filter (with
@@ -846,8 +899,15 @@ because &lt;a href=&quot;https://github.com/satwikkansal/wtfpython#-beware-of-de
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;c1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TxCollection&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/resource_translations&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;\
     &lt;span class=&quot;nb&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;resource&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;o:kb_org:p:kb1:r:fileless&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;language&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;l:el&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 &lt;span class=&quot;n&quot;&gt;c2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;translated&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;true&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c2&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;# (3, 1, False)
+
+&lt;span class=&quot;n&quot;&gt;c1&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;# &amp;lt;&amp;lt;&amp;lt; &amp;lt;TxCollection (3): 'o:kb_org:p:k...72e4fdb0:l:el',
+# ...                    'o:kb_org:p:k...e877d7ee:l:el',
+# ...                    'o:kb_org:p:k...ed953f8f:l:el'&amp;gt;
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c2&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;# &amp;lt;&amp;lt;&amp;lt; &amp;lt;TxCollection (1): 'o:kb_org:p:k...72e4fdb0:l:el'&amp;gt;
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c2&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;# &amp;lt;&amp;lt;&amp;lt; False
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;Works like a charm!&lt;/p&gt;

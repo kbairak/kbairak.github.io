@@ -79,7 +79,7 @@ actually be useful while avoiding common mistakes.</p>
 <p>A lot of people will be familiar with this:</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">f</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
-<span class="c1"># 'three'
+<span class="c1"># &lt;&lt;&lt; 'three'
 </span></code></pre></div></div>
 
 <p><code class="language-plaintext highlighter-rouge">__getitem__</code> is the method you override if you want your instances to respond
@@ -99,15 +99,15 @@ to the square bracket notation. Essentially <code class="language-plaintext high
 # 6 six
 </span>
 <span class="nb">list</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-<span class="c1"># ['zero', 'one', 'two', 'three', 'four', 'five', 'six']
+<span class="c1"># &lt;&lt;&lt; ['zero', 'one', 'two', 'three', 'four', 'five', 'six']
 </span></code></pre></div></div>
 
 <p>or this:</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">'three'</span> <span class="ow">in</span> <span class="n">f</span>
-<span class="c1"># True
+<span class="c1"># &lt;&lt;&lt; True
 </span><span class="s">'apple'</span> <span class="ow">in</span> <span class="n">f</span>
-<span class="c1"># False
+<span class="c1"># &lt;&lt;&lt; False
 </span></code></pre></div></div>
 
 <p>Before I explain what I <em>think</em> is going on, lets try to tweak the snippet to
@@ -140,13 +140,13 @@ see how it reacts:</p>
 <p>Although this would be a reasonable outcome:</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">list</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-<span class="c1"># ['zero', 'one', 'two', 'three', 'five', 'six']  # wrong
+<span class="c1"># &lt;&lt;&lt; ['zero', 'one', 'two', 'three', 'five', 'six']  # wrong
 </span></code></pre></div></div>
 
 <p>It turns out that the actual result is this:</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">list</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-<span class="c1"># ['zero', 'one', 'two', 'three']
+<span class="c1"># &lt;&lt;&lt; ['zero', 'one', 'two', 'three']
 </span></code></pre></div></div>
 
 <p>Lets try another tweak now:</p>
@@ -274,13 +274,18 @@ but it looks like it has yet another trick up its sleeve:</p>
   </li>
 </ol>
 
-<p>This explains all our examples. When we removed the <code class="language-plaintext highlighter-rouge">elif index == 4</code> part, it
-went straight to the <code class="language-plaintext highlighter-rouge">IndexError</code> and stopped the iteration. When we removed
-the <code class="language-plaintext highlighter-rouge">raise IndexError(index)</code> part, it went to the end of the body of the
-method, which in Python means that the method returns <code class="language-plaintext highlighter-rouge">None</code>; <code class="language-plaintext highlighter-rouge">None</code> is a
-perfectly acceptable value for <code class="language-plaintext highlighter-rouge">__getitem__</code> to return, so the iteration went
-on. When we injected a <code class="language-plaintext highlighter-rouge">3 / 0</code> somewhere, it raised a <code class="language-plaintext highlighter-rouge">ZeroDivisionError</code> in
-the middle of the iteration.</p>
+<p>This explains all our examples:</p>
+
+<ul>
+  <li>When we removed the <code class="language-plaintext highlighter-rouge">elif index == 4</code> part, it went straight to the
+<code class="language-plaintext highlighter-rouge">IndexError</code> and stopped the iteration</li>
+  <li>When we removed the <code class="language-plaintext highlighter-rouge">raise IndexError(index)</code> part, it went to the end of the
+body of the method, which in Python means that the method returns <code class="language-plaintext highlighter-rouge">None</code>;
+<code class="language-plaintext highlighter-rouge">None</code> is a perfectly acceptable value for <code class="language-plaintext highlighter-rouge">__getitem__</code> to return, so the
+iteration went on forever</li>
+  <li>When we injected a <code class="language-plaintext highlighter-rouge">3 / 0</code> somewhere, it raised a <code class="language-plaintext highlighter-rouge">ZeroDivisionError</code> in the
+middle of the iteration</li>
+</ul>
 
 <p>Lets now revert to our first example, the “correct” one, and try throwing some
 more curveballs at it:</p>
@@ -297,9 +302,10 @@ would simply have to try an iteration and count how many steps it took to reach
 an <code class="language-plaintext highlighter-rouge">IndexError</code>. But it doesn’t. It probably makes sense since iterable
 sequences may also be infinite sequences and Python would get stuck. The fact
 that <code class="language-plaintext highlighter-rouge">reversed()</code> doesn’t work wasn’t surprizing, especially since <code class="language-plaintext highlighter-rouge">len()</code>
-didn’t work.  How would Python know where to start? In fact, Python complains
-for the missing <code class="language-plaintext highlighter-rouge">len()</code> of <code class="language-plaintext highlighter-rouge">FakeList</code>, not <code class="language-plaintext highlighter-rouge">reversed()</code>. But it seems that we
-can fix both problems by adding <code class="language-plaintext highlighter-rouge">len()</code> to our <code class="language-plaintext highlighter-rouge">FakeList</code>:</p>
+didn’t work.  How would Python know where to start? In fact, when we called
+<code class="language-plaintext highlighter-rouge">reversed()</code>, Python complained about the missing <code class="language-plaintext highlighter-rouge">len()</code> of <code class="language-plaintext highlighter-rouge">FakeList</code>, not
+<code class="language-plaintext highlighter-rouge">reversed()</code>. But it seems that we can fix both problems by adding <code class="language-plaintext highlighter-rouge">len()</code> to
+our <code class="language-plaintext highlighter-rouge">FakeList</code>:</p>
 
 <div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code> class FakeList:
      def __getitem__(self, index):
@@ -326,10 +332,10 @@ can fix both problems by adding <code class="language-plaintext highlighter-roug
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">f</span> <span class="o">=</span> <span class="n">FakeList</span><span class="p">()</span>
 <span class="nb">len</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-<span class="c1"># 7
+<span class="c1"># &lt;&lt;&lt; 7
 </span>
 <span class="nb">list</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
-<span class="c1"># ['six', 'five', 'four', 'three', 'two', 'one', 'zero']
+<span class="c1"># &lt;&lt;&lt; ['six', 'five', 'four', 'three', 'two', 'one', 'zero']
 </span></code></pre></div></div>
 
 <p>So, to sum up. What can we do with our <code class="language-plaintext highlighter-rouge">FakeList</code> object?</p>
@@ -369,7 +375,7 @@ an instance of <code class="language-plaintext highlighter-rouge">cls</code> or 
 
 <span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Sized</span>
 <span class="nb">isinstance</span><span class="p">(</span><span class="n">NotSized</span><span class="p">(),</span> <span class="n">Sized</span><span class="p">)</span>
-<span class="c1"># True
+<span class="c1"># &lt;&lt;&lt; True
 </span></code></pre></div></div>
 
 <p>You can write your own ABCs, and the theory behind why they are needed and how
@@ -449,18 +455,38 @@ test:</p>
 </code></pre></div></div>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">f</span><span class="p">.</span><span class="n">index</span><span class="p">(</span><span class="s">'two'</span><span class="p">)</span>
-<span class="c1"># 2
+<span class="c1"># &lt;&lt;&lt; 2
 </span>
 <span class="n">f</span><span class="p">.</span><span class="n">count</span><span class="p">(</span><span class="s">'two'</span><span class="p">)</span>
-<span class="c1"># 1
+<span class="c1"># &lt;&lt;&lt; 1
 </span></code></pre></div></div>
 
 <p>So the bottom line of all this is:</p>
 
 <blockquote>
-  <p>If you want to make something that can be “officially” considered a readable
+  <p><strong>If you want to make something that can be “officially” considered a readable
 list-like object in Python, make it subclass <code class="language-plaintext highlighter-rouge">Sequence</code> and implement at
-least the <code class="language-plaintext highlighter-rouge">__getitem__</code> and <code class="language-plaintext highlighter-rouge">__len__</code> methods</p>
+least the <code class="language-plaintext highlighter-rouge">__getitem__</code> and <code class="language-plaintext highlighter-rouge">__len__</code> methods</strong></p>
+</blockquote>
+
+<p>The same conclusion holds true for all the ABCs listed in the
+<a href="https://docs.python.org/3/library/collections.abc.html">documentation</a>. For example, if you want to make a fully
+legitimate read-<strong>write</strong> list-like object, you would simply have to subclass
+from <code class="language-plaintext highlighter-rouge">MutableSequence</code> and implement the <code class="language-plaintext highlighter-rouge">__getitem__</code>, <code class="language-plaintext highlighter-rouge">__len__</code>,
+<code class="language-plaintext highlighter-rouge">__setitem__</code>, <code class="language-plaintext highlighter-rouge">__detitem__</code> and <code class="language-plaintext highlighter-rouge">insert</code> methods (the ones in the ‘Abstract
+methods’ column).</p>
+
+<p>There is a note in the <a href="https://docs.python.org/3/library/collections.abc.html">documentation</a> which is
+interesting, so we are going to include it here verbatim:</p>
+
+<blockquote>
+  <p>Implementation note: Some of the mixin methods, such as <code class="language-plaintext highlighter-rouge">__iter__()</code>,
+<code class="language-plaintext highlighter-rouge">__reversed__()</code> and <code class="language-plaintext highlighter-rouge">index()</code>, make repeated calls to the underlying
+<code class="language-plaintext highlighter-rouge">__getitem__()</code> method. Consequently, if <code class="language-plaintext highlighter-rouge">__getitem__()</code> is implemented with
+constant access speed, the mixin methods will have linear performance;
+however, if the underlying method is linear (as it would be with a linked
+list), the mixins will have quadratic performance and will likely need to be
+overridden.</p>
 </blockquote>
 
 <h1 id="part-3-chainable-methods">Part 3: Chainable methods</h1>
@@ -483,7 +509,7 @@ everything will come together in the end. Lets make another useless class.</p>
 <span class="n">c</span><span class="p">.</span><span class="n">increment</span><span class="p">()</span>
 <span class="n">c</span><span class="p">.</span><span class="n">increment</span><span class="p">()</span>
 <span class="n">c</span>
-<span class="c1"># &lt;Counter: 3&gt;
+<span class="c1"># &lt;&lt;&lt; &lt;Counter: 3&gt;
 </span></code></pre></div></div>
 
 <p>Nothing surprising here.</p>
@@ -493,7 +519,7 @@ could do:</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">c</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">().</span><span class="n">increment</span><span class="p">().</span><span class="n">increment</span><span class="p">().</span><span class="n">increment</span><span class="p">()</span>
 <span class="n">c</span>
-<span class="c1"># &lt;Counter: 3&gt;
+<span class="c1"># &lt;&lt;&lt; &lt;Counter: 3&gt;
 </span></code></pre></div></div>
 
 <p>The easiest way to accomplish this is to have <code class="language-plaintext highlighter-rouge">.increment()</code> return the
@@ -582,15 +608,17 @@ a slightly mutated copy of <code class="language-plaintext highlighter-rouge">ob
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">c1</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">().</span><span class="n">increment</span><span class="p">()</span>
 <span class="n">c2</span> <span class="o">=</span> <span class="n">c1</span><span class="p">.</span><span class="n">increment</span><span class="p">()</span>
-<span class="n">c1</span><span class="p">,</span> <span class="n">c2</span>
-<span class="c1"># (&lt;Counter: 2&gt;, &lt;Counter: 2&gt;)
-</span>
-<span class="n">c1</span> <span class="o">==</span> <span class="n">c2</span>
-<span class="c1"># True
+
+<span class="n">c1</span>
+<span class="c1"># &lt;&lt;&lt; &lt;Counter: 2&gt;
+</span><span class="n">c2</span>
+<span class="c1"># &lt;&lt;&lt; &lt;Counter: 2&gt;
+</span><span class="n">c1</span> <span class="o">==</span> <span class="n">c2</span>
+<span class="c1"># &lt;&lt;&lt; True
 </span></code></pre></div></div>
 
 <p>Someone not familiar with the implementation of <code class="language-plaintext highlighter-rouge">Counter</code> would assume that
-<code class="language-plaintext highlighter-rouge">c1</code> would have the value <code class="language-plaintext highlighter-rouge">1</code>.</p>
+<code class="language-plaintext highlighter-rouge">c1</code> would hold the value <code class="language-plaintext highlighter-rouge">1</code>.</p>
 
 <p>How do we <em>fix</em> this? My suggestion is: make the class’s initializer accept any
 optional arguments required to fully describe the instance’s state. Then,
@@ -616,11 +644,13 @@ changed, state.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">c1</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">().</span><span class="n">increment</span><span class="p">()</span>
 <span class="n">c2</span> <span class="o">=</span> <span class="n">c1</span><span class="p">.</span><span class="n">increment</span><span class="p">()</span>
-<span class="n">c1</span><span class="p">,</span> <span class="n">c2</span>
-<span class="c1"># (&lt;Counter: 1&gt;, &lt;Counter: 2&gt;)
-</span>
-<span class="n">c1</span> <span class="o">==</span> <span class="n">c2</span>
-<span class="c1"># False
+
+<span class="n">c1</span>
+<span class="c1"># &lt;&lt;&lt; &lt;Counter: 1&gt;
+</span><span class="n">c2</span>
+<span class="c1"># &lt;&lt;&lt; &lt;Counter: 2&gt;
+</span><span class="n">c1</span> <span class="o">==</span> <span class="n">c2</span>
+<span class="c1"># &lt;&lt;&lt; False
 </span></code></pre></div></div>
 
 <p>It might be a little better if we also do this:</p>
@@ -662,10 +692,11 @@ access the responses like lists. We are going to use the
         <span class="p">)</span>
         <span class="n">response</span><span class="p">.</span><span class="n">raise_for_status</span><span class="p">()</span>
         <span class="bp">self</span><span class="p">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">response</span><span class="p">.</span><span class="n">json</span><span class="p">()[</span><span class="s">'data'</span><span class="p">]</span>
+</code></pre></div></div>
 
-<span class="n">organizations</span> <span class="o">=</span> <span class="n">TxCollection</span><span class="p">(</span><span class="s">"/organizations"</span><span class="p">)</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">organizations</span> <span class="o">=</span> <span class="n">TxCollection</span><span class="p">(</span><span class="s">"/organizations"</span><span class="p">)</span>
 <span class="n">organizations</span><span class="p">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">'attributes'</span><span class="p">][</span><span class="s">'name'</span><span class="p">]</span>
-<span class="c1"># 'kb_org'
+<span class="c1"># &lt;&lt;&lt; 'diegobz'
 </span></code></pre></div></div>
 
 <p>Now lets make this behave like a list:</p>
@@ -702,17 +733,17 @@ access the responses like lists. We are going to use the
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">organizations</span> <span class="o">=</span> <span class="n">TxCollection</span><span class="p">(</span><span class="s">"/organizations"</span><span class="p">)</span>
 <span class="n">organizations</span>
-<span class="c1"># &lt;TxCollection (3): 'o:diegobz', 'o:kb_org', 'o:transifex'&gt;
+<span class="c1"># &lt;&lt;&lt; &lt;TxCollection (3): 'o:diegobz', 'o:kb_org', 'o:transifex'&gt;
 </span>
 <span class="n">organizations</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-<span class="c1"># {'id': 'o:transifex',
-#  'type': 'organizations',
-#  'attributes': {
-#   'name': 'Transifex',
-#   'slug': 'transifex',
-#   'logo_url': 'https://txc-assets-775662142440-prod.s3.amazonaws.com/mugshots/435381b2e0.jpg',
-#   'private': False},
-#  'links': {'self': 'https://rest.api.transifex.com/organizations/o:transifex'}}
+<span class="c1"># &lt;&lt;&lt; {'id': 'o:transifex',
+# ...  'type': 'organizations',
+# ...  'attributes': {
+# ...   'name': 'Transifex',
+# ...   'slug': 'transifex',
+# ...   'logo_url': 'https://txc-assets-775662142440-prod.s3.amazonaws.com/mugshots/435381b2e0.jpg',
+# ...   'private': False},
+# ...  'links': {'self': 'https://rest.api.transifex.com/organizations/o:transifex'}}
 </span></code></pre></div></div>
 
 <p>What is interesting here is that we <em>know</em> that our class is a legitimate
@@ -761,6 +792,11 @@ collections lazy:</p>
          return result
 </code></pre></div></div>
 
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">organizations</span> <span class="o">=</span> <span class="n">TxCollection</span><span class="p">(</span><span class="s">"/organizations"</span><span class="p">)</span>
+<span class="n">organizations</span>
+<span class="c1"># &lt;&lt;&lt; &lt;TxCollection (3): 'o:diegobz', 'o:kb_org', 'o:transifex'&gt;
+</span></code></pre></div></div>
+
 <p>Our <em>lazy</em> evaluation:</p>
 
 <ol>
@@ -768,21 +804,22 @@ collections lazy:</p>
   <li>Will abort early if the collection has already been evaluated</li>
 </ol>
 
-<p>To drive point 1 home, I will point out that our <code class="language-plaintext highlighter-rouge">__repr__</code> method does <strong>not</strong>
-explicitly trigger an evaluation, but triggers it nevertheless. The
-<code class="language-plaintext highlighter-rouge">for item in self</code> part in its first line will start an iteration, which will
-call <code class="language-plaintext highlighter-rouge">__getitem__</code> (as we saw in <em>Part 1</em>), which will trigger the evaluation.
-Even if it didn’t, the <code class="language-plaintext highlighter-rouge">len(self)</code> part in the second line would also trigger
-the evaluation.</p>
+<p>To drive point 1 home, I will point out that our <code class="language-plaintext highlighter-rouge">__repr__</code> method (the one
+that was called when we typed <code class="language-plaintext highlighter-rouge">organizations &lt;ENTER&gt;</code> into our python terminal)
+does <strong>not</strong> explicitly trigger an evaluation, but triggers it nevertheless.
+The <code class="language-plaintext highlighter-rouge">for item in self</code> part in its first line will start an iteration, which
+will call <code class="language-plaintext highlighter-rouge">__getitem__</code> (as we saw in <em>Part 1</em>), which will trigger the
+evaluation.  Even if it didn’t, the <code class="language-plaintext highlighter-rouge">len(self)</code> part in the second line would
+also trigger the evaluation.</p>
 
 <p>Playing with metaprogramming, which in this context means making things behave
 like things that they are not, can be tricky, dangerous and cause bugs, as
-anyone who has played with <code class="language-plaintext highlighter-rouge">__getattr__</code> and ran into <code class="language-plaintext highlighter-rouge">RecursionError</code>s can
+anyone who has played with <code class="language-plaintext highlighter-rouge">__setattr__</code> and ran into <code class="language-plaintext highlighter-rouge">RecursionError</code>s can
 attest to. This is the beauty of the conclusion from <em>Part 2</em>: we want to make
 <code class="language-plaintext highlighter-rouge">TxCollection</code> behave like a list and we know <strong>exactly</strong> which parts of the
 code trigger that behaviour: <code class="language-plaintext highlighter-rouge">__getitem__</code> and <code class="language-plaintext highlighter-rouge">__len__</code>. That’s the <strong>only</strong>
-parts we need to add our custom evaluation to in order to be 100% confident
-that <code class="language-plaintext highlighter-rouge">TxCollection</code> will properly behave like a readable list.</p>
+parts we need to add our lazy evaluation to in order to be 100% confident that
+<code class="language-plaintext highlighter-rouge">TxCollection</code> will properly behave like a readable list.</p>
 
 <p>Now lets apply filtering. We will intentionally do it the <em>wrong</em> way, by
 returning <code class="language-plaintext highlighter-rouge">self</code>, so that we can see the flaws outlined in <em>Part 3</em> in the
@@ -821,9 +858,9 @@ context of this example. Then we will fix it.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">TxCollection</span><span class="p">(</span><span class="s">"/resource_translations"</span><span class="p">).</span>\
     <span class="nb">filter</span><span class="p">(</span><span class="n">resource</span><span class="o">=</span><span class="s">"o:kb_org:p:kb1:r:fileless"</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="s">"l:el"</span><span class="p">)</span>
-<span class="c1"># &lt;TxCollection (3): 'o:kb_org:p:k...72e4fdb0:l:el',
-#                    'o:kb_org:p:k...e877d7ee:l:el',
-#                    'o:kb_org:p:k...ed953f8f:l:el'&gt;
+<span class="c1"># &lt;&lt;&lt; &lt;TxCollection (3): 'o:kb_org:p:k...72e4fdb0:l:el',
+# ...                    'o:kb_org:p:k...e877d7ee:l:el',
+# ...                    'o:kb_org:p:k...ed953f8f:l:el'&gt;
 </span></code></pre></div></div>
 
 <p><em>(Note: There are some Transifex-API-v3-specific things here, like how
@@ -836,19 +873,35 @@ documentation</a>)</em></p>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">c1</span> <span class="o">=</span> <span class="n">TxCollection</span><span class="p">(</span><span class="s">"/resource_translations"</span><span class="p">).</span>\
     <span class="nb">filter</span><span class="p">(</span><span class="n">resource</span><span class="o">=</span><span class="s">"o:kb_org:p:kb1:r:fileless"</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="s">"l:el"</span><span class="p">)</span>
 <span class="n">c2</span> <span class="o">=</span> <span class="n">c1</span><span class="p">.</span><span class="nb">filter</span><span class="p">(</span><span class="n">translated</span><span class="o">=</span><span class="s">"true"</span><span class="p">)</span>
-<span class="nb">len</span><span class="p">(</span><span class="n">c1</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">c2</span><span class="p">),</span> <span class="n">c1</span> <span class="o">==</span> <span class="n">c2</span>
-<span class="c1"># (1, 1, True)
+
+<span class="n">c1</span>
+<span class="c1"># &lt;&lt;&lt; &lt;TxCollection (1): 'o:kb_org:p:k...72e4fdb0:l:el'&gt;
+</span><span class="n">c2</span>
+<span class="c1"># &lt;&lt;&lt; &lt;TxCollection (1): 'o:kb_org:p:k...72e4fdb0:l:el'&gt;
+</span><span class="n">c1</span> <span class="o">==</span> <span class="n">c2</span>
+<span class="c1"># &lt;&lt;&lt; True
 </span></code></pre></div></div>
 
 <p>We know from our previous run that <code class="language-plaintext highlighter-rouge">c1</code> should have a size of 3, but it got
-overwritten when we applied <code class="language-plaintext highlighter-rouge">.filter()</code> to it. Also,</p>
+overwritten when we applied <code class="language-plaintext highlighter-rouge">.filter()</code> to it.</p>
+
+<p>Also,</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">c1</span> <span class="o">=</span> <span class="n">TxCollection</span><span class="p">(</span><span class="s">"/resource_translations"</span><span class="p">).</span>\
     <span class="nb">filter</span><span class="p">(</span><span class="n">resource</span><span class="o">=</span><span class="s">"o:kb_org:p:kb1:r:fileless"</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="s">"l:el"</span><span class="p">)</span>
 <span class="n">_</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">c1</span><span class="p">)</span>
 <span class="n">c2</span> <span class="o">=</span> <span class="n">c1</span><span class="p">.</span><span class="nb">filter</span><span class="p">(</span><span class="n">translated</span><span class="o">=</span><span class="s">"true"</span><span class="p">)</span>
-<span class="nb">len</span><span class="p">(</span><span class="n">c1</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">c2</span><span class="p">),</span> <span class="n">c1</span> <span class="o">==</span> <span class="n">c2</span>
-<span class="c1"># (3, 3, True)
+
+<span class="n">c1</span>
+<span class="c1"># &lt;&lt;&lt; &lt;TxCollection (3): 'o:kb_org:p:k...72e4fdb0:l:el',
+# ...                    'o:kb_org:p:k...e877d7ee:l:el',
+# ...                    'o:kb_org:p:k...ed953f8f:l:el'&gt;
+</span><span class="n">c2</span>
+<span class="c1"># &lt;&lt;&lt; &lt;TxCollection (3): 'o:kb_org:p:k...72e4fdb0:l:el',
+# ...                    'o:kb_org:p:k...e877d7ee:l:el',
+# ...                    'o:kb_org:p:k...ed953f8f:l:el'&gt;
+</span><span class="n">c1</span> <span class="o">==</span> <span class="n">c2</span>
+<span class="c1"># &lt;&lt;&lt; True
 </span></code></pre></div></div>
 
 <p>We forced an evaluation <strong>before</strong> we applied the second filter (with
@@ -893,8 +946,15 @@ because <a href="https://github.com/satwikkansal/wtfpython#-beware-of-default-mu
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">c1</span> <span class="o">=</span> <span class="n">TxCollection</span><span class="p">(</span><span class="s">"/resource_translations"</span><span class="p">).</span>\
     <span class="nb">filter</span><span class="p">(</span><span class="n">resource</span><span class="o">=</span><span class="s">"o:kb_org:p:kb1:r:fileless"</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="s">"l:el"</span><span class="p">)</span>
 <span class="n">c2</span> <span class="o">=</span> <span class="n">c1</span><span class="p">.</span><span class="nb">filter</span><span class="p">(</span><span class="n">translated</span><span class="o">=</span><span class="s">"true"</span><span class="p">)</span>
-<span class="nb">len</span><span class="p">(</span><span class="n">c1</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">c2</span><span class="p">),</span> <span class="n">c1</span> <span class="o">==</span> <span class="n">c2</span>
-<span class="c1"># (3, 1, False)
+
+<span class="n">c1</span>
+<span class="c1"># &lt;&lt;&lt; &lt;TxCollection (3): 'o:kb_org:p:k...72e4fdb0:l:el',
+# ...                    'o:kb_org:p:k...e877d7ee:l:el',
+# ...                    'o:kb_org:p:k...ed953f8f:l:el'&gt;
+</span><span class="n">c2</span>
+<span class="c1"># &lt;&lt;&lt; &lt;TxCollection (1): 'o:kb_org:p:k...72e4fdb0:l:el'&gt;
+</span><span class="n">c1</span> <span class="o">==</span> <span class="n">c2</span>
+<span class="c1"># &lt;&lt;&lt; False
 </span></code></pre></div></div>
 
 <p>Works like a charm!</p>
