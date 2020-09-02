@@ -705,14 +705,15 @@ collections lazy:
      HOST = "https://rest.api.transifex.com"
  
      def __init__(self, url):
-         self._url = url
++        self._url = url
 +        self._data = None
  
 +    def _evaluate(self):
 +        if self._data is not None:
 +            return
          response = requests.get(
-             self.HOST + self._url,
+-            self.HOST + url,
++            self.HOST + self._url,
              headers={'Content-Type': "application/vnd.api+json",
                       'Authorization': f"Bearer {os.environ['API_TOKEN']}"},
          )

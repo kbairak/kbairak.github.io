@@ -764,15 +764,16 @@ collections lazy:</p>
      HOST = "https://rest.api.transifex.com"
  
      def __init__(self, url):
-         self._url = url
-<span class="gi">+        self._data = None
+<span class="gi">+        self._url = url
++        self._data = None
 </span> 
 <span class="gi">+    def _evaluate(self):
 +        if self._data is not None:
 +            return
 </span>         response = requests.get(
-             self.HOST + self._url,
-             headers={'Content-Type': "application/vnd.api+json",
+<span class="gd">-            self.HOST + url,
+</span><span class="gi">+            self.HOST + self._url,
+</span>             headers={'Content-Type': "application/vnd.api+json",
                       'Authorization': f"Bearer {os.environ['API_TOKEN']}"},
          )
          response.raise_for_status()

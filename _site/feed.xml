@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.0">Jekyll</generator><link href="https://kbairak.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://kbairak.github.io/" rel="alternate" type="text/html" /><updated>2020-08-30T16:07:01+03:00</updated><id>https://kbairak.github.io/feed.xml</id><title type="html">kbairak’s blog</title><subtitle>Mostly programming tips and tutorials, mostly in Python. But who knows? I may rumble about other things as well.</subtitle><entry><title type="html">How to properly make list-like objects in Python</title><link href="https://kbairak.github.io/programming/python/2020/08/29/how-to-make-list-like-objects-in-python.html" rel="alternate" type="text/html" title="How to properly make list-like objects in Python" /><published>2020-08-29T15:00:00+03:00</published><updated>2020-08-29T15:00:00+03:00</updated><id>https://kbairak.github.io/programming/python/2020/08/29/how-to-make-list-like-objects-in-python</id><content type="html" xml:base="https://kbairak.github.io/programming/python/2020/08/29/how-to-make-list-like-objects-in-python.html">&lt;p&gt;In this post we will be talking about how Python likes to deal with “list-like
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.0">Jekyll</generator><link href="https://kbairak.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://kbairak.github.io/" rel="alternate" type="text/html" /><updated>2020-09-02T14:45:21+03:00</updated><id>https://kbairak.github.io/feed.xml</id><title type="html">kbairak’s blog</title><subtitle>Mostly programming tips and tutorials, mostly in Python. But who knows? I may rumble about other things as well.</subtitle><entry><title type="html">How to properly make list-like objects in Python</title><link href="https://kbairak.github.io/programming/python/2020/08/29/how-to-make-list-like-objects-in-python.html" rel="alternate" type="text/html" title="How to properly make list-like objects in Python" /><published>2020-08-29T15:00:00+03:00</published><updated>2020-08-29T15:00:00+03:00</updated><id>https://kbairak.github.io/programming/python/2020/08/29/how-to-make-list-like-objects-in-python</id><content type="html" xml:base="https://kbairak.github.io/programming/python/2020/08/29/how-to-make-list-like-objects-in-python.html">&lt;p&gt;In this post we will be talking about how Python likes to deal with “list-like
 objects”. We will be diving into some quirks of Python that might seem a bit
 weird and, in the end, hopefully teach you how to build something that could
 actually be useful while avoiding common mistakes.&lt;/p&gt;
@@ -717,15 +717,16 @@ collections lazy:&lt;/p&gt;
      HOST = &quot;https://rest.api.transifex.com&quot;
  
      def __init__(self, url):
-         self._url = url
-&lt;span class=&quot;gi&quot;&gt;+        self._data = None
+&lt;span class=&quot;gi&quot;&gt;+        self._url = url
++        self._data = None
 &lt;/span&gt; 
 &lt;span class=&quot;gi&quot;&gt;+    def _evaluate(self):
 +        if self._data is not None:
 +            return
 &lt;/span&gt;         response = requests.get(
-             self.HOST + self._url,
-             headers={'Content-Type': &quot;application/vnd.api+json&quot;,
+&lt;span class=&quot;gd&quot;&gt;-            self.HOST + url,
+&lt;/span&gt;&lt;span class=&quot;gi&quot;&gt;+            self.HOST + self._url,
+&lt;/span&gt;             headers={'Content-Type': &quot;application/vnd.api+json&quot;,
                       'Authorization': f&quot;Bearer {os.environ['API_TOKEN']}&quot;},
          )
          response.raise_for_status()
