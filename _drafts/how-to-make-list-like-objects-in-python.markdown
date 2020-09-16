@@ -1,10 +1,3 @@
----
-layout: post
-title:  "How to properly make list-like objects in Python"
-date:   2020-08-29 15:00:00 +0300
-categories: programming python
----
-
 In this post we will be talking about how Python likes to deal with "list-like
 objects". We will be diving into some quirks of Python that might seem a bit
 weird and, in the end, hopefully teach you how to build something that could
@@ -218,8 +211,8 @@ for i, n in enumerate(f):
 With all of this in mind, lets try to figure out what Python does when you try
 to iterate over an object. The steps are, in order:
 
-1. See if object has an `__iter__` method. If it does, call it and `yield` the
-   results.
+1. See if the object has an `__iter__` method. If it does, call it and `yield`
+   the results.
 
 2. See if the object has a `__next__` method. If it does, call it repeatedly,
    `yield` each result until at some point it raises a `StopIteration`
@@ -886,8 +879,11 @@ object and have `.filter()` return a slightly mutated copy of `self`.
      # def __getitem__, __len__, __repr__
 ```
 
-_(Note: we didn't set `params={}` as the default value in the initializer
+_(Note 1: we didn't set `params={}` as the default value in the initializer
 because [you shouldn't use mutable default arguments][wtf-python])_
+
+_(Note 2: As you may know, and as you can see from this example, the
+`dict.update` method returns `None` in Python. Now you know why.)_
 
 ```python
 c1 = TxCollection("/resource_translations").\
