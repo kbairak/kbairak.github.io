@@ -7,6 +7,9 @@ serve: install
 reloadserve: install
 	bundle exec jekyll serve --livereload
 
+draftreloadserve: install
+	bundle exec jekyll serve --livereload --drafts
+
 build:
 	bundle exec jekyll build
 

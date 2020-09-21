@@ -110,6 +110,16 @@ list(f)
 # <<< ['zero', 'one', 'two', 'three']
 ```
 
+Also:
+
+```python
+'three' in f
+# <<< True
+
+'five' in f
+# <<< False
+```
+
 Lets try another tweak now:
 
 ```diff
@@ -323,7 +333,8 @@ interface". ABCs introduce something that in the Python ecosystem is called
 
 Long story short, Abstract Base Classes allow you to call
 `isinstance(obj, cls)` and have it return `True`, when in fact `obj` is **not**
-an instance of `cls` or one of its subclasses. Lets see it in action:
+an instance of `cls` or one of its subclasses, but `obj` implements `cls`'s
+**"interface"**. Lets see it in action:
 
 ```python
 class NotSized:

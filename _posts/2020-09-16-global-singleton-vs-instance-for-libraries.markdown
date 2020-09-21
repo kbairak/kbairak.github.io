@@ -5,6 +5,8 @@ date:   2020-09-16 21:00:00 +0300
 categories: programming python
 ---
 
+## Introduction
+
 Lets assume we are working with an HTTP API SDK. Here is the first snippet from
 [Stripe's documentation][stripe-docs]:
 
@@ -42,6 +44,8 @@ So, now it seems we are creating custom instances that represent connections to
 the GitHub API, which we configure during initialization. Again, pretty
 straightforward, but why are there 2 approaches? Which is better?
 
+## My solution
+
 I have struggled with this dilemma in the past and my final choice is...
 (drumroll) ... **both**.
 
@@ -65,7 +69,7 @@ class Foo:
         if username is not None:
             self.username = username
         if password is not None:
-            self.username = username
+            self.password = password
         if api_token is not None:
             self.api_token = api_token
 ```
@@ -151,7 +155,7 @@ class Foo:
 
 In this example, the foo object is considered "fully configured" if it either
 has a username/password pair or an API token. The `configured` property lets
-the user protect against using it when it's not configured properly.
+the user protect against using the object when it's not configured properly.
 
 You can add to this:
 
@@ -189,8 +193,9 @@ to provide a few cache implementations. Finally, lets assume that all
 implementations receive the same parameter. We want to allow users to choose a
 cache implementation to their liking and to be able to configure it with that
 parameter. We also want users to be able to pass that parameter to the base
-`foo` object's configuration to make things simple. In short, we want **all**
-of these to be possible:
+`foo` object's configuration to make things simple.
+
+In short, we want **all** of these to be possible:
 
 ```python
 from foo import foo

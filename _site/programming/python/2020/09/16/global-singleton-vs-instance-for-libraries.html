@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Global singleton objects vs class instances for libraries | kbairak’s blog</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Global singleton objects vs class instances for libraries" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Introduction" />
+<meta property="og:description" content="Introduction" />
+<link rel="canonical" href="https://kbairak.github.io/programming/python/2020/09/16/global-singleton-vs-instance-for-libraries.html" />
+<meta property="og:url" content="https://kbairak.github.io/programming/python/2020/09/16/global-singleton-vs-instance-for-libraries.html" />
+<meta property="og:site_name" content="kbairak’s blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-09-16T21:00:00+03:00" />
+<script type="application/ld+json">
+{"dateModified":"2020-09-16T21:00:00+03:00","datePublished":"2020-09-16T21:00:00+03:00","description":"Introduction","mainEntityOfPage":{"@type":"WebPage","@id":"https://kbairak.github.io/programming/python/2020/09/16/global-singleton-vs-instance-for-libraries.html"},"url":"https://kbairak.github.io/programming/python/2020/09/16/global-singleton-vs-instance-for-libraries.html","@type":"BlogPosting","headline":"Global singleton objects vs class instances for libraries","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://kbairak.github.io/feed.xml" title="kbairak's blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">kbairak&#39;s blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Global singleton objects vs class instances for libraries</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2020-09-16T21:00:00+03:00" itemprop="datePublished">Sep 16, 2020
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <h2 id="introduction">Introduction</h2>
+
+<p>Lets assume we are working with an HTTP API SDK. Here is the first snippet from
+<a href="https://github.com/stripe/stripe-python#usage">Stripe’s documentation</a>:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">stripe</span>
+<span class="n">stripe</span><span class="p">.</span><span class="n">api_key</span> <span class="o">=</span> <span class="s">"sk_test_..."</span>
+
+<span class="c1"># list customers
+</span><span class="n">customers</span> <span class="o">=</span> <span class="n">stripe</span><span class="p">.</span><span class="n">Customer</span><span class="p">.</span><span class="nb">list</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>I would say this is pretty straightforward. There is a global object you
+import, you edit its configuration for authentication purposes and then you are
+able to access its attributes in order to interact with the API.</p>
+
+<p>Lets try one from <a href="https://pygithub.readthedocs.io/en/latest/introduction.html">PyGithub</a>:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">github</span> <span class="kn">import</span> <span class="n">Github</span>
+
+<span class="c1"># using username and password
+</span><span class="n">g</span> <span class="o">=</span> <span class="n">Github</span><span class="p">(</span><span class="s">"user"</span><span class="p">,</span> <span class="s">"password"</span><span class="p">)</span>
+
+<span class="c1"># or using an access token
+</span><span class="n">g</span> <span class="o">=</span> <span class="n">Github</span><span class="p">(</span><span class="s">"access_token"</span><span class="p">)</span>
+
+<span class="c1"># Github Enterprise with custom hostname
+</span><span class="n">g</span> <span class="o">=</span> <span class="n">Github</span><span class="p">(</span><span class="n">base_url</span><span class="o">=</span><span class="s">"https://{hostname}/api/v3"</span><span class="p">,</span> <span class="n">login_or_token</span><span class="o">=</span><span class="s">"access_token"</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">repo</span> <span class="ow">in</span> <span class="n">g</span><span class="p">.</span><span class="n">get_user</span><span class="p">().</span><span class="n">get_repos</span><span class="p">():</span>
+    <span class="c1"># ...
+</span></code></pre></div></div>
+
+<p>So, now it seems we are creating custom instances that represent connections to
+the GitHub API, which we configure during initialization. Again, pretty
+straightforward, but why are there 2 approaches? Which is better?</p>
+
+<h2 id="my-solution">My solution</h2>
+
+<p>I have struggled with this dilemma in the past and my final choice is…
+(drumroll) … <strong>both</strong>.</p>
+
+<p>Here’s how it works:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># package/core.py
+</span>
+<span class="k">class</span> <span class="nc">Foo</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">host</span> <span class="o">=</span> <span class="s">"https://api.foo.com"</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">username</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">password</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">api_token</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="bp">self</span><span class="p">.</span><span class="n">setup</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">username</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">api_token</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">host</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">host</span> <span class="o">=</span> <span class="n">host</span>
+        <span class="k">if</span> <span class="n">username</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">username</span> <span class="o">=</span> <span class="n">username</span>
+        <span class="k">if</span> <span class="n">password</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">password</span> <span class="o">=</span> <span class="n">password</span>
+        <span class="k">if</span> <span class="n">api_token</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">api_token</span> <span class="o">=</span> <span class="n">api_token</span>
+</code></pre></div></div>
+
+<p>We set <strong>default</strong> values in <code class="language-plaintext highlighter-rouge">__init__</code>, override them in <code class="language-plaintext highlighter-rouge">setup</code> and we make
+<code class="language-plaintext highlighter-rouge">__init__</code> conclude by delegating to <code class="language-plaintext highlighter-rouge">setup</code>.</p>
+
+<p>What this does is make the following 2 snippets identical:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">kwargs</span> <span class="o">=</span> <span class="p">...</span>
+<span class="n">f</span> <span class="o">=</span> <span class="n">Foo</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">kwargs</span> <span class="o">=</span> <span class="p">...</span>
+<span class="n">f</span> <span class="o">=</span> <span class="n">Foo</span><span class="p">()</span>
+<span class="n">f</span><span class="p">.</span><span class="n">setup</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>So lets assume we are writing an SDK for the <em>foo.com</em> service. We will do:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># foo/core.py
+</span><span class="k">class</span> <span class="nc">Foo</span><span class="p">:</span>
+    <span class="c1"># ...
+</span>
+<span class="c1"># foo/__init__.py
+</span><span class="kn">from</span> <span class="nn">.core</span> <span class="kn">import</span> <span class="n">Foo</span>
+<span class="n">foo</span> <span class="o">=</span> <span class="n">Foo</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>Now, someone who wants to use the foo SDK can either:</p>
+
+<ul>
+  <li>
+    <p>Use the global object:</p>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># my_app.py
+</span><span class="kn">from</span> <span class="nn">foo</span> <span class="kn">import</span> <span class="n">foo</span>
+<span class="n">foo</span><span class="p">.</span><span class="n">setup</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s">"..."</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s">"..."</span><span class="p">)</span>
+<span class="n">foo</span><span class="p">.</span><span class="n">do_something</span><span class="p">()</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Or create a custom one (or more):</p>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># my_app.py
+</span><span class="kn">from</span> <span class="nn">foo</span> <span class="kn">import</span> <span class="n">Foo</span>
+<span class="n">foo1</span> <span class="o">=</span> <span class="n">Foo</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s">"..."</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s">"..."</span><span class="p">)</span>
+<span class="n">foo2</span> <span class="o">=</span> <span class="n">Foo</span><span class="p">(</span><span class="n">api_token</span><span class="o">=</span><span class="s">"..."</span><span class="p">)</span>
+<span class="n">foo1</span><span class="p">.</span><span class="n">do_something</span><span class="p">()</span>
+<span class="n">foo2</span><span class="p">.</span><span class="n">do_something</span><span class="p">()</span>
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h2 id="objections">Objections</h2>
+
+<blockquote>
+  <p>How do we ensure that an object is properly setup? Previously we could raise
+an exception if the user didn’t supply enough arguments during
+initialization. Now we can’t.</p>
+</blockquote>
+
+<p>It’s true. Since <code class="language-plaintext highlighter-rouge">__init__</code> must work <strong>even without any arguments</strong>, it’s
+possible to make an instance that is not properly configured. My first answer
+to this is: <em>“Python is an
+<a href="https://docs.python.org/3.4/glossary.html#term-eafp">easier-to-ask-for-forgiveness-than-permission</a> language”</em>. Or to put it
+in other words: <em>“Hey buddy, I told you how to initialize the object in the
+docs; it’s not my fault you didn’t supply all the arguments”</em>.</p>
+
+<p>So, yeah, do nothing. Eventually the missing parameters will lead to an error.
+That’s fine.</p>
+
+<p>However, you might not be entirely satisfied with this approach. There are ways
+to make things better that don’t sacrifice a lot of the elegance:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Foo</span><span class="p">:</span>
+    <span class="c1"># __init__, setup, ...
+</span>
+    <span class="o">@</span><span class="nb">property</span>
+    <span class="k">def</span> <span class="nf">configured</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">((</span><span class="bp">self</span><span class="p">.</span><span class="n">username</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="p">.</span><span class="n">password</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">)</span> <span class="ow">or</span>
+                <span class="bp">self</span><span class="p">.</span><span class="n">api_token</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>In this example, the foo object is considered “fully configured” if it either
+has a username/password pair or an API token. The <code class="language-plaintext highlighter-rouge">configured</code> property lets
+the user protect against using the object when it’s not configured properly.</p>
+
+<p>You can add to this:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Foo</span><span class="p">:</span>
+    <span class="c1"># __init__, setup, configured
+</span>
+    <span class="k">def</span> <span class="nf">require_configured</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="p">.</span><span class="n">configured</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="nb">ValueError</span><span class="p">(</span><span class="s">"Foo object is not properly configured"</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">do_something</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">...):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">require_configured</span><span class="p">()</span>
+        <span class="c1"># ...
+</span></code></pre></div></div>
+
+<p>The exception will be raised when you attempt to <strong>use</strong> the foo object, not
+during initialization. But you can add a call to <code class="language-plaintext highlighter-rouge">require_configured</code> after
+your initialization to get what you want. It only takes one extra line of code:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">foo</span> <span class="kn">import</span> <span class="n">foo</span>
+<span class="n">foo</span><span class="p">.</span><span class="n">setup</span><span class="p">(...)</span>
+<span class="n">foo</span><span class="p">.</span><span class="n">require_configured</span><span class="p">()</span>  <span class="c1"># &lt;--
+</span><span class="n">foo</span><span class="p">.</span><span class="n">do_something</span><span class="p">(...)</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p>What if the parameters have more complex types than simple strings? What if
+they are instances of classes that also need to be configured?</p>
+</blockquote>
+
+<p>To explain what this question is about, lets describe it as an example: So,
+lets say that the <em>foo.com</em> service serves a lot of data and that we want our
+SDK to cache that data so that it doesn’t retrieve it every time. We also want
+to provide a few cache implementations. Finally, lets assume that all
+implementations receive the same parameter. We want to allow users to choose a
+cache implementation to their liking and to be able to configure it with that
+parameter. We also want users to be able to pass that parameter to the base
+<code class="language-plaintext highlighter-rouge">foo</code> object’s configuration to make things simple.</p>
+
+<p>In short, we want <strong>all</strong> of these to be possible:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">foo</span> <span class="kn">import</span> <span class="n">foo</span>
+<span class="kn">from</span> <span class="nn">foo.cache</span> <span class="kn">import</span> <span class="n">MemoryCache</span><span class="p">,</span> <span class="n">DiskCache</span>
+
+<span class="n">foo</span><span class="p">.</span><span class="n">setup</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="n">MemoryCache</span><span class="p">())</span>
+<span class="n">foo</span><span class="p">.</span><span class="n">setup</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="n">DiskCache</span><span class="p">())</span>
+<span class="n">foo</span><span class="p">.</span><span class="n">setup</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="n">MemoryCache</span><span class="p">(</span><span class="n">ttl</span><span class="o">=</span><span class="mi">30</span><span class="p">))</span>
+<span class="n">foo</span><span class="p">.</span><span class="n">setup</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="n">DiskCache</span><span class="p">(</span><span class="n">ttl</span><span class="o">=</span><span class="mi">30</span><span class="p">))</span>
+<span class="n">foo</span><span class="p">.</span><span class="n">setup</span><span class="p">(</span><span class="n">cache_ttl</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+<span class="n">foo</span><span class="p">.</span><span class="n">setup</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="n">MemoryCache</span><span class="p">(),</span> <span class="n">cache_ttl</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+<span class="n">foo</span><span class="p">.</span><span class="n">setup</span><span class="p">(</span><span class="n">cache</span><span class="o">=</span><span class="n">DiskCache</span><span class="p">(),</span> <span class="n">cache_ttl</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>The catch here is that we want the TTL option to be available either as a kwarg
+to <code class="language-plaintext highlighter-rouge">foo</code>’s <code class="language-plaintext highlighter-rouge">setup</code> method or as a kwarg to the cache’s initializer. We <em>may</em>
+want this because it’s possible that most users will use the default option for
+the cache implementation and may want to simply change the TTL value.</p>
+
+<p>How could we go about this? My answer would be:</p>
+
+<ol>
+  <li>
+    <p>Implement the cache classes like the <code class="language-plaintext highlighter-rouge">Foo</code> class:</p>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># foo/cache.py
+</span><span class="k">class</span> <span class="nc">CacheBase</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">ttl</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">setup</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ttl</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">ttl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">ttl</span> <span class="o">=</span> <span class="n">ttl</span>
+
+<span class="k">class</span> <span class="nc">MemoryCache</span><span class="p">(</span><span class="n">CacheBase</span><span class="p">):</span>
+    <span class="c1"># get, set, ...
+</span>
+<span class="k">class</span> <span class="nc">DiskCache</span><span class="p">(</span><span class="n">CacheBase</span><span class="p">):</span>
+    <span class="c1"># get, set, ...
+</span></code></pre></div>    </div>
+  </li>
+  <li>
+    <p>At the end of <code class="language-plaintext highlighter-rouge">Foo.setup</code>, delegate to <code class="language-plaintext highlighter-rouge">cache.setup</code>:</p>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># foo/core.py
+</span><span class="kn">from</span> <span class="nn">.cache</span> <span class="kn">import</span> <span class="n">MemoryCache</span>
+<span class="k">class</span> <span class="nc">Foo</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">cache</span> <span class="o">=</span> <span class="n">MemoryCache</span><span class="p">()</span>  <span class="c1"># Default value
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">setup</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">cache_ttl</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">cache</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">cache</span> <span class="o">=</span> <span class="n">cache</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">cache</span><span class="p">.</span><span class="n">setup</span><span class="p">(</span><span class="n">ttl</span><span class="o">=</span><span class="n">cache_ttl</span><span class="p">)</span>
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<p><em>So, what if you do both, ie <code class="language-plaintext highlighter-rouge">foo.setup(DiskCache(ttl=20), cache_ttl=30)</code>?
+Well, (hey buddy) I don’t feel like I have to protect you from that. If you are
+curious, you can figure it out from the code nevertheless.</em></p>
+
+<p>This type of nesting lends itself to nice implementations of the <code class="language-plaintext highlighter-rouge">configured</code>
+property we mentioned before:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Foo</span><span class="p">:</span>
+    <span class="c1"># __init__, setup, ...
+</span>    <span class="o">@</span><span class="nb">property</span>
+    <span class="k">def</span> <span class="nf">configured</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">username</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span>
+                <span class="bp">self</span><span class="p">.</span><span class="n">password</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span>
+                <span class="bp">self</span><span class="p">.</span><span class="n">cache</span><span class="p">.</span><span class="n">configured</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>assuming the cache classes also have a property called <code class="language-plaintext highlighter-rouge">configured</code>.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>This is a bike-shedding problem. You can choose any solution and it will work
+fine. While working on your SDK, there are going to be far more difficult
+problems to solve. So, why did I write this?</p>
+
+<p>Well, in terms of features, it offers the “hybrid” approach: You can offer the
+simpler global-object approach for most cases, but if your user needs multiple
+instances, there’s nothing stopping them from doing so, without sacrificing any
+of the elegance of the code. It also tackles the nested configuration issue
+which can become complicated and lead to complicated code.</p>
+
+<p>The main reason, however, is that it is a solid, one-size-fits-all solution. As
+I said, this is a bike-shedding problem, which means that you can spend a lot
+of time on it even though it is not a difficult problem to solve. Having a
+solution ready can save a lot of frustration and lost time.</p>
+
+
+  </div><a class="u-url" href="/programming/python/2020/09/16/global-singleton-vs-instance-for-libraries.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">kbairak&#39;s blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">kbairak&#39;s blog</li><li><a class="u-email" href="mailto:ikijob@gmail.com">ikijob@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/kbairak"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">kbairak</span></a></li><li><a href="https://www.twitter.com/kbairak"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">kbairak</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>Mostly programming tips and tutorials, mostly in Python. But who knows? I may rumble about other things as well.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
