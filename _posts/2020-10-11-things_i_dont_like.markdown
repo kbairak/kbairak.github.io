@@ -295,5 +295,35 @@ later versions things became way more sensible. They probably implemented these
 as proofs-of-concept in order to make an implementation for a paper they wanted
 published)_
 
+### 5.1: The word 'executor'
+
+I get it. Normally you would have to define a function with a hundred
+arguments. So it might seem better to you if you do things like this:
+
+```python
+class FooExecutor:
+    def __init__(self, arg1, arg2, arg3, arg4):
+        self.arg1 = arg1
+        self.arg2 = arg2
+        self.arg3 = arg3
+        self.arg4 = arg4
+
+    def prepare(self, arg5, arg6, arg7):
+        self.arg5 = arg5
+        self.arg6 = arg6
+        self.arg7 = arg7
+
+    def execute(self, arg8, arg9, arg10):
+        # ...
+
+executor = FooExecutor(1, 2, 3, 4)
+executor.prepare(5, 6, 7)
+result = executor.do(8, 9, 10)
+```
+
+If this looks like the best thing you can do, then there's something wrong with
+the overall design. You need to take a step back, take a deep breath and
+refactor your code so that it makes more sense.
+
 [MutableMapping]: https://docs.python.org/3/library/collections.abc.html#collections.abc.MutableMapping
 [tensorflow-tutorial]: https://github.com/tensorflow/nmt#inference--how-to-generate-translations

@@ -195,8 +195,8 @@ class MyException(Exception):
 ```
 
 This is a bit boilerplate-y but overall I think it's worth it to ensure the
-`Exception` objects remain consistent. Things can be made better with a helper,
-I guess:
+`Exception` objects remain consistent. Things can be made better with a
+utility, I guess:
 
 ```python
 # utils.py

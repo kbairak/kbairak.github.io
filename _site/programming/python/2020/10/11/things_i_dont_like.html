@@ -341,6 +341,35 @@ later versions things became way more sensible. They probably implemented these
 as proofs-of-concept in order to make an implementation for a paper they wanted
 published)</em></p>
 
+<h3 id="51-the-word-executor">5.1: The word ‘executor’</h3>
+
+<p>I get it. Normally you would have to define a function with a hundred
+arguments. So it might seem better to you if you do things like this:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">FooExecutor</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">,</span> <span class="n">arg3</span><span class="p">,</span> <span class="n">arg4</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">arg1</span> <span class="o">=</span> <span class="n">arg1</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">arg2</span> <span class="o">=</span> <span class="n">arg2</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">arg3</span> <span class="o">=</span> <span class="n">arg3</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">arg4</span> <span class="o">=</span> <span class="n">arg4</span>
+
+    <span class="k">def</span> <span class="nf">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg5</span><span class="p">,</span> <span class="n">arg6</span><span class="p">,</span> <span class="n">arg7</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">arg5</span> <span class="o">=</span> <span class="n">arg5</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">arg6</span> <span class="o">=</span> <span class="n">arg6</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">arg7</span> <span class="o">=</span> <span class="n">arg7</span>
+
+    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg8</span><span class="p">,</span> <span class="n">arg9</span><span class="p">,</span> <span class="n">arg10</span><span class="p">):</span>
+        <span class="c1"># ...
+</span>
+<span class="n">executor</span> <span class="o">=</span> <span class="n">FooExecutor</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">executor</span><span class="p">.</span><span class="n">prepare</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">executor</span><span class="p">.</span><span class="n">do</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>If this looks like the best thing you can do, then there’s something wrong with
+the overall design. You need to take a step back, take a deep breath and
+refactor your code so that it makes more sense.</p>
+
 
   </div><a class="u-url" href="/programming/python/2020/10/11/things_i_dont_like.html" hidden></a>
 </article>
