@@ -309,6 +309,67 @@ setters for everything.</p>
         <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 </code></pre></div>    </div>
   </li>
+  <li>
+    <p>validations:</p>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Foo</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+
+    <span class="o">@</span><span class="nb">property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">_name</span>
+
+    <span class="o">@</span><span class="n">name</span><span class="p">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="nb">ValueError</span><span class="p">(</span><span class="s">"'name' should be a string"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">value</span>
+</code></pre></div>    </div>
+
+    <p>(sigh) Actually, I take that back. I don’t think you should do validations
+(unless it’s part of the business logic of course, ie you want to tell the
+user he made a mistake).  It goes against the <a href="https://docs.python.org/3.4/glossary.html#term-eafp">easier to ask for forgiveness
+than permission</a> principle. Realistically, you will have looked into
+the docs (or the code) before assigning an attribute, so you should know what
+type it needs. The most common problem is that you will unintentionally
+assign a <code class="language-plaintext highlighter-rouge">None</code> value when it’s not what you want. But, also realistically,
+you will have made your validation logic <strong>accept</strong> <code class="language-plaintext highlighter-rouge">None</code> for that
+attribute. Or you will assign an empty string and further down it will cause
+a bug. Then you will not only have to fix the bug, by figuring out where an
+empty string was produced and passed as an argument, but also “fix” the
+validation.</p>
+
+    <p>A <em>validated</em> object does not equal <em>an object that will not cause bugs</em>. The
+bugs, when they appear, will probably either be:</p>
+
+    <ol>
+      <li>
+        <p>because of the validation</p>
+      </li>
+      <li>
+        <p>something that the validation couldn’t have protected you against.</p>
+      </li>
+    </ol>
+
+    <p>And even when the validation does protect you from a bug:</p>
+
+    <ol>
+      <li>
+        <p>You would have found it anyway since another exception would have been
+raised further on</p>
+      </li>
+      <li>
+        <p>You will still need to fix it</p>
+      </li>
+    </ol>
+
+    <p>In general, you end up with far too many problems for a <strong>very</strong> slim
+possibility that you find yourself in a <em>“phew, I would have gotten into so
+much trouble if it weren’t for that validation”</em> moment.</p>
+
+    <p>And in any case, in the words of the WHO secretary: “test test test”.</p>
+  </li>
 </ul>
 
 <h2 id="5-the-word-helper">5. The word ‘helper’</h2>
@@ -341,7 +402,7 @@ later versions things became way more sensible. They probably implemented these
 as proofs-of-concept in order to make an implementation for a paper they wanted
 published)</em></p>
 
-<h3 id="51-the-word-executor">5.1: The word ‘executor’</h3>
+<h3 id="52-the-word-executor">5.2: The word ‘executor’</h3>
 
 <p>I get it. Normally you would have to define a function with a hundred
 arguments. So it might seem better to you if you do things like this:</p>

@@ -264,6 +264,57 @@ For me, properties should limit themselves to:
           return self.args[1]
   ```
 
+- validations:
+
+  ```python
+  class Foo:
+      def __init__(self, name):
+          self.name = name
+
+      @property
+      def name(self):
+          return self._name
+
+      @name.setter
+      def name(self, value):
+          if not isinstance(value, str):
+              raise ValueError("'name' should be a string")
+          self._name = value
+  ```
+
+  (sigh) Actually, I take that back. I don't think you should do validations
+  (unless it's part of the business logic of course, ie you want to tell the
+  user he made a mistake).  It goes against the [easier to ask for forgiveness
+  than permission][eafp] principle. Realistically, you will have looked into
+  the docs (or the code) before assigning an attribute, so you should know what
+  type it needs. The most common problem is that you will unintentionally
+  assign a `None` value when it's not what you want. But, also realistically,
+  you will have made your validation logic **accept** `None` for that
+  attribute. Or you will assign an empty string and further down it will cause
+  a bug. Then you will not only have to fix the bug, by figuring out where an
+  empty string was produced and passed as an argument, but also "fix" the
+  validation.
+
+  A _validated_ object does not equal _an object that will not cause bugs_. The
+  bugs, when they appear, will probably either be:
+
+  1. because of the validation
+
+  2. something that the validation couldn't have protected you against.
+
+  And even when the validation does protect you from a bug:
+
+  1. You would have found it anyway since another exception would have been
+     raised further on
+
+  2. You will still need to fix it
+
+  In general, you end up with far too many problems for a **very** slim
+  possibility that you find yourself in a _"phew, I would have gotten into so
+  much trouble if it weren't for that validation"_ moment.
+
+  And in any case, in the words of the WHO secretary: "test test test".
+
 ## 5. The word 'helper'
 
 Instead of providing examples and/or arguments, I will simply list a snippet
@@ -295,7 +346,7 @@ later versions things became way more sensible. They probably implemented these
 as proofs-of-concept in order to make an implementation for a paper they wanted
 published)_
 
-### 5.1: The word 'executor'
+### 5.2: The word 'executor'
 
 I get it. Normally you would have to define a function with a hundred
 arguments. So it might seem better to you if you do things like this:
@@ -326,4 +377,5 @@ the overall design. You need to take a step back, take a deep breath and
 refactor your code so that it makes more sense.
 
 [MutableMapping]: https://docs.python.org/3/library/collections.abc.html#collections.abc.MutableMapping
+[eafp]: https://docs.python.org/3.4/glossary.html#term-eafp
 [tensorflow-tutorial]: https://github.com/tensorflow/nmt#inference--how-to-generate-translations
