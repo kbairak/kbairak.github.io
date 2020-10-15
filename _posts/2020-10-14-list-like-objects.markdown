@@ -1,3 +1,12 @@
+---
+layout: post
+title:  "Making list-like objects in Python, the right way"
+date:   2020-10-14 21:00:00 +0300
+categories: programming python
+---
+
+_This was originally published in [hackernoon][hackernoon] for Transifex._
+
 In this post we will be talking about how Python likes to deal with "list-like
 objects". We will be diving into some quirks of Python that might seem a bit
 weird and, in the end, hopefully teach you how to build something that could
@@ -358,7 +367,7 @@ built in. If you visit the [documentation page of
 | `Sequence` | `Reversible`, `Collection` | `__getitem__`, `__len__` | `__contains__`, `__iter__`, `__reversed__`, `index`, `count` |
 | ...        | ...                        | ...                      | ...                                                             |
 
-This tells us the following: If your class subclasses `Sequence` and defines
+This tells us the following: If your class inherits from `Sequence` and defines
 the `__getitem__` and `__len__` methods, then:
 
 1. calling `isinstance(obj, Sequence)` will return `True` and
@@ -373,7 +382,7 @@ The first statement is not really surprising, but it is important because it
 turns out that `isinstance(obj, Sequence) == True` is the "official" way of
 saying that `obj` is a readable list-like object in Python.
 
-What is interesting here is that, even without subclassing from `Sequence`,
+What is interesting here is that, even without inheriting from `Sequence`,
 Python already gave `__contains__`, `__iter__` and `__reversed__` to our
 `FakeList` class from _Part 1_. Lets put the last two mixin methods to the
 test:
@@ -386,7 +395,7 @@ f.count('two')
 # AttributeError: 'FakeList' object has no attribute 'count'
 ```
 
-We can fix this by subclassing `FakeList` from `Sequence`
+We can fix this by having `FakeList` inherit from `Sequence`
 
 ```diff
 +from collections.abc import Sequence
@@ -407,14 +416,14 @@ f.count('two')
 
 So the bottom line of all this is:
 
-> **If you want to make something that can be "officially" considered a readable
-> list-like object in Python, make it subclass `Sequence` and implement at
-> least the `__getitem__` and `__len__` methods**
+> **If you want to make something that can be "officially" considered a
+> readable list-like object in Python, make it inherit from `Sequence` and
+> implement at least the `__getitem__` and `__len__` methods**
 
 The same conclusion holds true for all the ABCs listed in the
 [documentation][collections-abc-docs]. For example, if you want to make a fully
-legitimate read-**write** list-like object, you would simply have to subclass
-from `MutableSequence` and implement the `__getitem__`, `__len__`,
+legitimate read-**write** list-like object, you would simply have to inherit
+from from `MutableSequence` and implement the `__getitem__`, `__len__`,
 `__setitem__`, `__detitem__` and `insert` methods (the ones in the 'Abstract
 methods' column).
 
@@ -692,7 +701,7 @@ organizations[2]
 
 What is interesting here is that we _know_ that our class is a legitimate
 readable list-like object because we fulfilled the requirements we set in _Part
-2_: we subclassed from `collections.abc.Sequence` and implemented the
+2_: we inherited from `collections.abc.Sequence` and implemented the
 `__getitem__` and `__len__` methods.
 
 Now, if you are familiar with Django querysets, you will know that you can
@@ -936,6 +945,7 @@ I hope this has been interesting. You can write powerful and expressive code
 with what is explained here, hopefully without introducing bugs.
 
 
+[hackernoon]: https://hackernoon.com/making-list-like-objects-in-python-the-right-way-6b1s3ws5
 [collections-abc-docs]: https://docs.python.org/3/library/collections.abc.html
 [collections-abc-code]: https://github.com/python/cpython/blob/3.8/Lib/_collections_abc.py#L856
 [guido-email]: https://mail.python.org/pipermail/python-dev/2003-October/038855.html
