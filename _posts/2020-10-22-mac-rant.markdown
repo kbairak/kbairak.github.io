@@ -1,0 +1,172 @@
+---
+layout: post
+title:  "A rant about Macs"
+date:   2020-10-21 21:00:00 +0300
+categories: operating-systems
+---
+
+A little backstory: Back in 2013, my company-issued Thinkpad laptop died. The
+company was in a "lets get everyone Macs" mood. The idea was that some people
+would need to use Macs, like designers, and would need to setup Transifex. So,
+if they ran into problems, it would be good if the developers were running the
+same environment in order to help them. I resisted strongly and was one of the
+last to be "converted". But when my previous laptop died, I kind-of didn't have
+a choice.
+
+Thankfully, now that we are running everything through Docker and Kubernetes,
+it makes a lot more sense to have Linux laptops so a lot of people have
+"converted" back. I am now happily running Arch Linux in a company-issued Dell
+Latitude laptop, having spent a few months running Arch Linux on the Mac since
+it was the only way to make it perform reasonably well after a few MacOS
+updates (my personal instructions on how to do that
+[here][mac-os-instructions]).
+
+Back in 2013, after I spent a weekend setting up my Mac, I sent this email to
+the rest of the company. It was fun writing it and it was well received, so I
+thought I'd share it here:
+
+
+> tl;dr Rant about Macs.
+> 
+> I spent the whole weekend trying to get this thing to work at acceptable
+> levels of efficiency. My frustration is difficult to describe...
+> 
+> There are two levels of frustration, as a semi-casual user and as a
+> developer.
+> 
+> As a semi-casual user:
+> - 3 sources of software: The app store that I never use (save for xcode)
+>   because it has nothing useful, homebrew for command-line tools and
+>   downloading binaries from web pages. DOWNLOADING BINARIES FROM WEB PAGES!!!
+>   Are we serious? I haven't done this kind of thing since I was using
+>   Windows!  What is this, 2004? I mean with Fedora or Ubuntu I had to
+>   download sources from webpages once or twice for really crazy tools that I
+>   wanted to check out, but with Arch everything, and I mean everything, is
+>   available from the package manager.
+> 
+> - Hey, here's a cool idea. Lets add a fourth modifier key!!! I mean, even
+>   windows got this one right. Leave shift, alt and control to the application
+>   (looks like they're more than enough) but the windows-key is reserved for
+>   the window manager. Same with every graphical environment in Linux. It's
+>   hard enough that the modifier keys are in the worst possible place on the
+>   keyboard, I have to remember the difference between ctrl-tab and
+>   command-tab, alt-arrow keys instead of ctrl-arrow keys to have the cursor
+>   jump whole words, alt-backspace instead of ctrl-backspace which does
+>   nothing or command-backspace which deletes the entire line!!!
+> 
+> - Lets talk about window management in macs: there is none. Microsoft still
+>   doesn't have virtual desktops which strikes me as weird. After all, they
+>   put tabs in IE7; 5 years later than everyone else, but still. With Mac I
+>   though I would be ok since they seem to have this. The caveat is that even
+>   if you organize your windows across virtual desktops, it doesn't matter.
+>   Command-tab still shows you all applications from all virtual desktops in
+>   the order they were last used, instead of filtering to those that are in
+>   the current virtual desktop, and you still need to keep pressing
+>   command-tab until you get to the window you actually want. Again, what is
+>   this, 2004???
+> 
+> - WiFi connected but no internet, every other wireless device at home has
+>   internet, reconnect to the network countless times, nothing. What fixed it?
+>   Reboot. Yay...
+> 
+> - Trying to get a break from all the frustration by streaming a movie from my
+>   desktop PC to marvel at the opening scene from star wars episode 3 in my
+>   awesome new retina display. Every other device I've tried can effortlessly
+>   discover and stream movies from my smb server at my desktop PC, even the
+>   xbmc program on my AppleTV, even the Maemo phone I had before. The Mac? No.
+>   I have to manually enter 'smb://kbairak-desktop/' at the hidden 'connect to
+>   server' menu option. Then navigating to a folder inside the smb server
+>   takes 6 seconds, yay! Seeking to a specific part of the video? Another 6
+>   seconds. FYI smb is a protocol adopted by Microsoft and is supported by all
+>   pcs for the last 20 years!
+> 
+> - So, my movie list inside the smb server is pretty big. "No problem" I
+>   think, I'll use finder's integrated search feature. Which defaults to
+>   searching the entire mac, even if I just navigated to a specific folder. I
+>   tell it to search the current folder for a string, go to the bathroom,
+>   return and finally my results are there.
+> 
+> - Although this mac seems faster than the thinkpad, it's 3-4 years younger
+>   after all, hangouts is very slow. I don't know what causes this, after all
+>   it was very slow in Ubuntu as well, although in Arch it was great. Also, it
+>   makes a lot of noise. The fact that I was warned about this does not help.
+> 
+> - The dock auto-hides even when there is no window blocking it. Okay, this is
+>   nit-picking but I would assume that with the level of polish MacOS is
+>   rumored to have, this would be a no-brainer. Even a community-contributed
+>   dock plugin for Gnome does this ffs.
+> 
+> - I'm probably missing a few things; I may follow up later.
+> 
+> Conclusion: It's so incredibly amateur. Like a bunch of kids with the
+> prettiest and highest quality football outfits imaginable going up against
+> Barcelona.
+> 
+> As a developer:
+> 
+> - Lets open tmux. The text shifts two characters right and left at random
+>   times while the cursor is in a different position than the one displayed!
+>   The solution? Add some weird tmux-related commands to my tmux config file.
+>   Sure, why not? After all we migrated from Linux to avoid nasty hacks and
+>   just get work done, right?
+> 
+> - Lets open Vim with NERDTree, possibly the most popular Vim plugin. The
+>   arrow symbols that indicate directories are displayed as ~U07-something and
+>   I can no longer navigate to folders. The solution? Add an 'export
+>   locale="UTF8"' or something in my .bashrc/.zshrc. Sure, why not? After all
+>   we migrated from Linux to avoid nasty hacks and just get work done, right?
+> 
+> - Using zsh with the vi-mode and git plugins makes the terminal lag. Again,
+>   it makes the terminal lag. The solution? reset the $PATH variable in my
+>   .zshrc so that /usr/local/bin comes before /usr/bin because Mac's default
+>   git implementation is buggy and I have to give priority to the one I
+>   installed from homebrew. Sure, why not? After all we migrated from Linux to
+>   avoid nasty hacks and just get work done, right?
+> 
+> - Lets get mkvirtualenv work! `brew install pyenv-virtualenvwrapper` brings
+>   me a different program, I removed it. `sudo pip install virtualenvwrapper`
+>   does not work. Python can't find the virtualenvwrapper module. The
+>   solution?  `easy-install pip` before you `sudo pip install
+>   virtualenvwrapper` because mac's version of pip is buggy and doesn't link
+>   modules properly and you have to give priority to the upstream version.
+>   Sure, why not? After all we migrated from Linux to avoid nasty hacks and
+>   just get work done, right?
+> 
+> - I thought it was a good opportunity to check out docker so that we could
+>   share a development image across the team and make sure we all have
+>   identical environments. After all, I had to set up a new development
+>   environment from scratch, so it seemed like a good idea. The problem? I
+>   can't get my mac and docker containers to share folders. In retrospect,
+>   this makes sense. Docker can share folders between the docker host and the
+>   containers. Docker doesn't run natively on mac however and the docker host
+>   is a virtual machine, not my mac. Found a workaround using VirtualBox's
+>   shared folders, no point in sharing it here. The most frustrating bit with
+>   this is that I should have known about it in advance.
+> 
+> - I can't seem to connect to my postgresql-server using a tcp connection,
+>   only the 'trust' method. You may ask why use tcp? I ask you, why not?
+> 
+> - Lets install the YouCompleteMe vim plugin, possibly the most useful one
+>   that exists. It doesn't work with mac's default vim, doesn't work with
+>   homebrew's vim. I either have to compile vim from source or symlink to the
+>   vim binary that MacVim provides. Sure, why not? After all we migrated from
+>   Linux to avoid nasty hacks and just get work done, right?
+> 
+> - I'm probably missing a few things; I may follow up later. I haven't yet
+>   tried to install meld after all.
+> 
+> Conclusion: When you're using a Mac for development purposes, what you're
+> basically trying to do is emulate Linux, all the time. So the obvious
+> question becomes: Why not use Linux straight away?
+> 
+> The irony is that it turns out that the things I was most afraid of when
+> switching to a Mac turned out to be easily resolved. (For the curious ones it
+> was mapping caps lock to work as both control and escape and finding a guake
+> alternative). What ruined things is stuff that I expected to work and were
+> utterly broken. Which is a shame since the number one thing everyone was
+> telling me about macs was how everything works as it was supposed to without
+> effort...
+
+At least the Docker stuff has been fixed since.
+
+[mac-os-instructions]: https://workflowy.com/s/arch-linux-installat/bTRApumv35kEiZyz
