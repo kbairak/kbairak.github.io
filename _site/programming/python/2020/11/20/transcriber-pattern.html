@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>The Transcriber pattern | kbairak’s blog</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="The Transcriber pattern" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Introduction" />
+<meta property="og:description" content="Introduction" />
+<link rel="canonical" href="https://kbairak.github.io/programming/python/2020/11/20/transcriber-pattern.html" />
+<meta property="og:url" content="https://kbairak.github.io/programming/python/2020/11/20/transcriber-pattern.html" />
+<meta property="og:site_name" content="kbairak’s blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-11-20T20:00:00+02:00" />
+<script type="application/ld+json">
+{"headline":"The Transcriber pattern","dateModified":"2020-11-20T20:00:00+02:00","datePublished":"2020-11-20T20:00:00+02:00","description":"Introduction","mainEntityOfPage":{"@type":"WebPage","@id":"https://kbairak.github.io/programming/python/2020/11/20/transcriber-pattern.html"},"url":"https://kbairak.github.io/programming/python/2020/11/20/transcriber-pattern.html","@type":"BlogPosting","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://kbairak.github.io/feed.xml" title="kbairak's blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">kbairak&#39;s blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">The Transcriber pattern</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2020-11-20T20:00:00+02:00" itemprop="datePublished">Nov 20, 2020
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <h2 id="introduction">Introduction</h2>
+
+<p>I would like to share a small and very easy to write class that has helped me
+in the past a lot. It can help greatly when transcribing one piece of text to
+another, applying some transformation along the way. Without further ado:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Transcriber</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">source</span> <span class="o">=</span> <span class="n">source</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">destination</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">ptr</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># Copy
+</span>    <span class="k">def</span> <span class="nf">copy_until</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">until</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">destination</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">source</span><span class="p">[</span><span class="bp">self</span><span class="p">.</span><span class="n">ptr</span><span class="p">:</span><span class="n">until</span><span class="p">])</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">ptr</span> <span class="o">=</span> <span class="n">until</span>
+
+    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">copy_until</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">ptr</span> <span class="o">+</span> <span class="n">length</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">copy_until_end</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">copy_until</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Skip
+</span>    <span class="k">def</span> <span class="nf">skip_until</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">until</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">ptr</span> <span class="o">=</span> <span class="n">until</span>
+
+    <span class="k">def</span> <span class="nf">skip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">skip_until</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">ptr</span> <span class="o">+</span> <span class="n">length</span><span class="p">)</span>
+
+    <span class="c1"># Add
+</span>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">destination</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_destination</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">""</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">destination</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h2 id="first-example">First example</h2>
+
+<p>Lets see it in action. Here we replace all lines that contain the word ‘error’
+to uppercase:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">capitalize_error</span><span class="p">(</span><span class="n">source</span><span class="p">):</span>
+    <span class="n">transcriber</span> <span class="o">=</span> <span class="n">Transcriber</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">source</span><span class="p">.</span><span class="n">splitlines</span><span class="p">():</span>
+        <span class="k">if</span> <span class="s">'error'</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">transcriber</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">line</span><span class="p">.</span><span class="n">upper</span><span class="p">())</span>
+            <span class="n">transcriber</span><span class="p">.</span><span class="n">skip</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">transcriber</span><span class="p">.</span><span class="n">copy</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">))</span>
+        <span class="n">transcriber</span><span class="p">.</span><span class="n">copy</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># Copy the '\n'
+</span>    <span class="k">return</span> <span class="n">transcriber</span><span class="p">.</span><span class="n">get_destination</span><span class="p">()</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">capitalize_error</span><span class="p">(</span><span class="s">"""
+line one
+line two
+line three with error
+line four
+"""</span><span class="p">.</span><span class="n">strip</span><span class="p">()))</span>
+
+<span class="c1"># &lt;&lt;&lt; line one
+# &lt;&lt;&lt; line two
+# &lt;&lt;&lt; LINE THREE WITH ERROR
+# &lt;&lt;&lt; line four
+</span></code></pre></div></div>
+
+<h2 id="explanation">Explanation</h2>
+
+<p>To describe what this does with text (should probably be a docstring), we could
+say:</p>
+
+<blockquote>
+  <p>Monitors the gradual transcription of <code class="language-plaintext highlighter-rouge">source</code> to <code class="language-plaintext highlighter-rouge">destination</code>. During the
+process, you can copy or skip chunks of <code class="language-plaintext highlighter-rouge">source</code> and interject your own
+chunks.</p>
+</blockquote>
+
+<p>As is frequent with pieces of code I am fond of, the nice thing about the
+<code class="language-plaintext highlighter-rouge">Transcriber</code> is not that it does something very complicated or clever. Rather,
+it exposes an interface that abstracts something very tedious, allowing you to
+write good-looking and unobscure code.</p>
+
+<p>So, the idea is that you initialize the <code class="language-plaintext highlighter-rouge">Transcriber</code> object with a <code class="language-plaintext highlighter-rouge">source</code>
+argument. Then you inspect the contents of <code class="language-plaintext highlighter-rouge">source</code> in parallel, figuring out
+interesting positions. Finally you use the <code class="language-plaintext highlighter-rouge">copy</code>, <code class="language-plaintext highlighter-rouge">skip</code> and <code class="language-plaintext highlighter-rouge">add</code> methods on
+the <code class="language-plaintext highlighter-rouge">Transcriber</code> to either copy or replace parts of the source to your
+destination.</p>
+
+<p>In some use cases, the content we are trying to transcribe follows a specific
+format (eg XML). It is usually preferable to use an appropriate library to
+deserialize the content into a data structure, modify the data structure to
+what we want and then use the library to serialize it back the desired format.
+I agree, in most cases this <em>is</em> preferable. The <code class="language-plaintext highlighter-rouge">Transcriber</code> can help a lot
+when you want to preserve as much of the source content as possible.</p>
+
+<h2 id="more-examples">More examples</h2>
+
+<p>Here we capitalize the contents of a <code class="language-plaintext highlighter-rouge">&lt;b&gt;</code> tag in XML:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">capitalize_b</span><span class="p">(</span><span class="n">source</span><span class="p">):</span>
+    <span class="n">transcriber</span> <span class="o">=</span> <span class="n">Transcriber</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+    <span class="n">ptr</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># 'hello &lt;b&gt;john&lt;/b&gt;, how was your day?'
+</span>            <span class="c1">#        ^
+</span>            <span class="n">ptr</span> <span class="o">=</span> <span class="n">source</span><span class="p">.</span><span class="n">index</span><span class="p">(</span><span class="s">'&lt;b'</span><span class="p">,</span> <span class="n">ptr</span><span class="p">)</span>
+        <span class="k">except</span> <span class="nb">ValueError</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># 'hello &lt;b&gt;john&lt;/b&gt;, how was your day?'
+</span>            <span class="c1">#          ^
+</span>            <span class="n">ptr</span> <span class="o">=</span> <span class="n">source</span><span class="p">.</span><span class="n">index</span><span class="p">(</span><span class="s">'&gt;'</span><span class="p">,</span> <span class="n">ptr</span><span class="p">)</span>
+        <span class="k">except</span> <span class="nb">ValueError</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="c1"># 'hello &lt;b&gt;john&lt;/b&gt;, how was your day?'
+</span>        <span class="c1">#           ^
+</span>        <span class="n">start</span> <span class="o">=</span> <span class="n">ptr</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># 'hello &lt;b&gt;john&lt;/b&gt;, how was your day?'
+</span>            <span class="c1">#               ^
+</span>            <span class="n">end</span> <span class="o">=</span> <span class="n">source</span><span class="p">.</span><span class="n">index</span><span class="p">(</span><span class="s">'&lt;/b&gt;'</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span>
+        <span class="k">except</span> <span class="nb">ValueError</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="n">transcriber</span><span class="p">.</span><span class="n">copy_until</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
+        <span class="n">transcriber</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">source</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">].</span><span class="n">upper</span><span class="p">())</span>
+        <span class="n">transcriber</span><span class="p">.</span><span class="n">skip_until</span><span class="p">(</span><span class="n">end</span><span class="p">)</span>
+        <span class="c1"># 'hello &lt;b&gt;john&lt;/b&gt;, how was your day?'
+</span>        <span class="c1">#                   ^
+</span>        <span class="n">ptr</span> <span class="o">=</span> <span class="n">end</span> <span class="o">+</span> <span class="mi">4</span>
+    <span class="n">transcriber</span><span class="p">.</span><span class="n">copy_until_end</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">transcriber</span><span class="p">.</span><span class="n">get_destination</span><span class="p">()</span>
+
+<span class="n">capitalize_b</span><span class="p">(</span><span class="s">'hello &lt;b class="red"&gt;john&lt;/b&gt;, how was your &lt;b&gt;day&lt;/b&gt;?'</span><span class="p">)</span>
+<span class="c1"># &lt;&lt;&lt; 'hello &lt;b class="red"&gt;JOHN&lt;/b&gt;, how was your &lt;b&gt;DAY&lt;/b&gt;?'
+</span></code></pre></div></div>
+
+<p>Lets try another one:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">ast</span>
+
+
+<span class="k">def</span> <span class="nf">get_pos</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">lineno</span><span class="p">,</span> <span class="n">col_offset</span><span class="p">):</span>
+    <span class="s">""" Resolve the actual position based on line and column offset. """</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="nb">sum</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">source</span><span class="p">.</span><span class="n">splitlines</span><span class="p">()[:</span><span class="n">lineno</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]))</span> <span class="o">+</span>
+            <span class="n">col_offset</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">MyVisitor</span><span class="p">(</span><span class="n">ast</span><span class="p">.</span><span class="n">NodeVisitor</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">().</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">source</span> <span class="o">=</span> <span class="n">source</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">transcriber</span> <span class="o">=</span> <span class="n">Transcriber</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">visit_Call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">.</span><span class="n">func</span><span class="p">,</span> <span class="n">ast</span><span class="p">.</span><span class="n">Name</span><span class="p">)</span> <span class="ow">and</span> <span class="n">node</span><span class="p">.</span><span class="n">func</span><span class="p">.</span><span class="nb">id</span> <span class="o">==</span> <span class="s">"foo"</span><span class="p">:</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">get_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">source</span><span class="p">,</span>
+                            <span class="n">node</span><span class="p">.</span><span class="n">func</span><span class="p">.</span><span class="n">lineno</span><span class="p">,</span>
+                            <span class="n">node</span><span class="p">.</span><span class="n">func</span><span class="p">.</span><span class="n">col_offset</span><span class="p">)</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="n">get_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">source</span><span class="p">,</span>
+                          <span class="n">node</span><span class="p">.</span><span class="n">func</span><span class="p">.</span><span class="n">end_lineno</span><span class="p">,</span>
+                          <span class="n">node</span><span class="p">.</span><span class="n">func</span><span class="p">.</span><span class="n">end_col_offset</span><span class="p">)</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">transcriber</span><span class="p">.</span><span class="n">copy_until</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">transcriber</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="s">"BAR"</span><span class="p">)</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">transcriber</span><span class="p">.</span><span class="n">skip_until</span><span class="p">(</span><span class="n">end</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">generic_visit</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">replace_foo_with_BAR</span><span class="p">(</span><span class="n">source</span><span class="p">):</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">MyVisitor</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+    <span class="n">v</span><span class="p">.</span><span class="n">visit</span><span class="p">(</span><span class="n">ast</span><span class="p">.</span><span class="n">parse</span><span class="p">(</span><span class="n">source</span><span class="p">))</span>
+    <span class="n">v</span><span class="p">.</span><span class="n">transcriber</span><span class="p">.</span><span class="n">copy_until_end</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">v</span><span class="p">.</span><span class="n">transcriber</span><span class="p">.</span><span class="n">get_destination</span><span class="p">()</span>
+
+
+<span class="n">source</span> <span class="o">=</span> <span class="s">"""
+foo("Simple use-case")
+foo = "When not used as a function call it should not be transformed"
+func("neither when used as an argument", foo)
+if some_condition:
+    foo("Works in any place of the code")
+foo("Also when", kwarg=foo("nested"))
+"""</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">replace_foo_with_BAR</span><span class="p">(</span><span class="n">source</span><span class="p">))</span>
+<span class="c1"># &lt;&lt;&lt; BAR("Simple use-case")
+# &lt;&lt;&lt; foo = "When not used as a function call it should not be transformed"
+# &lt;&lt;&lt; func("neither when used as an argument", foo)
+# &lt;&lt;&lt; if some_condition:
+# &lt;&lt;&lt;     BAR("Works in any place of the code")
+# &lt;&lt;&lt; BAR("Also when", kwarg=BAR("nested"))
+</span></code></pre></div></div>
+
+  </div><a class="u-url" href="/programming/python/2020/11/20/transcriber-pattern.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">kbairak&#39;s blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">kbairak&#39;s blog</li><li><a class="u-email" href="mailto:ikijob@gmail.com">ikijob@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/kbairak"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">kbairak</span></a></li><li><a href="https://www.twitter.com/kbairak"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">kbairak</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>Mostly programming tips and tutorials, mostly in Python. But who knows? I may rumble about other things as well.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
