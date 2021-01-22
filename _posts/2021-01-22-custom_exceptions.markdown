@@ -1,9 +1,11 @@
 ---
 layout: post
 title:  "Consistent custom exception classes in Python"
-date:   2020-09-23 18:00:00 +0300
+date:   2021-01-21 18:00:00 +0300
 categories: programming python
 ---
+
+_This was originally published in [hackernoon][hackernoon] for Transifex._
 
 Having to handle exceptions is common in Python and so is having to define your
 own. Yet, I have seen competing ways of doing so in various projects. The
@@ -82,7 +84,7 @@ e = Exception(1, b=2)
 When we defined our own `__init__` method, making it able to accept the `msg`
 keyword argument, there was a difference between the resulting objects when we
 passed positional arguments versus when we passed keyword arguments. In short,
-the following look like they should be identical, but they aren't:
+the following look like they should be identical, but aren't:
 
 ```python
 MyException("Something went wrong").args      # <<< ('Something went wrong',)
@@ -234,3 +236,5 @@ This looks like a lot of work, but:
 2. Using the `exc_property` trick, you will only write the slightly messier
    code only once, the `Exception` subclasses themselves will remain short and
    sweet
+
+[hackernoon]: https://hackernoon.com/consistent-custom-exception-classes-in-python-sd153w0l
