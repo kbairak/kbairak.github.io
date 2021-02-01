@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Messing around with the Python shell | kbairak’s blog</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Messing around with the Python shell" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Intro" />
+<meta property="og:description" content="Intro" />
+<link rel="canonical" href="https://kbairak.github.io/programming/python/2021/02/01/messing-with-the-python-shell.html" />
+<meta property="og:url" content="https://kbairak.github.io/programming/python/2021/02/01/messing-with-the-python-shell.html" />
+<meta property="og:site_name" content="kbairak’s blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-02-01T20:00:00+02:00" />
+<script type="application/ld+json">
+{"description":"Intro","url":"https://kbairak.github.io/programming/python/2021/02/01/messing-with-the-python-shell.html","@type":"BlogPosting","headline":"Messing around with the Python shell","dateModified":"2021-02-01T20:00:00+02:00","datePublished":"2021-02-01T20:00:00+02:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://kbairak.github.io/programming/python/2021/02/01/messing-with-the-python-shell.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://kbairak.github.io/feed.xml" title="kbairak's blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">kbairak&#39;s blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Messing around with the Python shell</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2021-02-01T20:00:00+02:00" itemprop="datePublished">Feb 1, 2021
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <h2 id="intro">Intro</h2>
+
+<p>A lot of people hate bash scripting. Every time I have to do even the simplest
+thing, I have to look up the documentation. How to I forward a function’s
+arguments to a child command? How do I assign a string to a variable and then
+call that string as a command? How do I check if two string variables are
+equal? How do I split a string into two and get the latter? etc</p>
+
+<p>However, you can’t deny the power of having entire programs act as mere
+functions and how natural it is to pipe a program’s output into another program.
+So, I was wondering, can you combine some of bash’s features with Python?</p>
+
+<h2 id="the-basics">The basics</h2>
+
+<p>Lets start with a class. It’s a simple one that saves its initialization
+arguments to a local variable, evaluates itself lazily with
+<a href="https://docs.python.org/3/library/subprocess.html#subprocess.run"><code class="language-plaintext highlighter-rouge">subprocess.run</code></a> and saves its result.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">subprocess</span>
+
+<span class="k">class</span> <span class="nc">PipePy</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">_args</span> <span class="o">=</span> <span class="n">args</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">_result</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">_evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="p">.</span><span class="n">_result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">_result</span> <span class="o">=</span> <span class="n">subprocess</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">_args</span><span class="p">,</span>
+                                      <span class="n">capture_output</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                                      <span class="n">text</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="o">@</span><span class="nb">property</span>
+    <span class="k">def</span> <span class="nf">returncode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">_evaluate</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">_result</span><span class="p">.</span><span class="n">returncode</span>
+
+    <span class="o">@</span><span class="nb">property</span>
+    <span class="k">def</span> <span class="nf">stdout</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">_evaluate</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">_result</span><span class="p">.</span><span class="n">stdout</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">stdout</span>
+
+    <span class="o">@</span><span class="nb">property</span>
+    <span class="k">def</span> <span class="nf">stderr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">_evaluate</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">_result</span><span class="p">.</span><span class="n">stderr</span>
+</code></pre></div></div>
+
+<p>and lets take it out for a spin:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ls</span> <span class="o">=</span> <span class="n">PipePy</span><span class="p">(</span><span class="s">'ls'</span><span class="p">)</span>
+<span class="n">ls_l</span> <span class="o">=</span> <span class="n">PipePy</span><span class="p">(</span><span class="s">'ls'</span><span class="p">,</span> <span class="s">'-l'</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">ls</span><span class="p">)</span>
+<span class="c1"># &lt;&lt;&lt; files.txt
+# ... main.py
+# ... tags
+</span><span class="k">print</span><span class="p">(</span><span class="n">ls_l</span><span class="p">)</span>
+<span class="c1"># &lt;&lt;&lt; total 16
+# ... -rw-r--r-- 1 kbairak kbairak  125 Jan 22 08:53 files.txt
+# ... -rw-r--r-- 1 kbairak kbairak 5425 Feb  1 21:54 main.py
+# ... -rw-r--r-- 1 kbairak kbairak 1838 Feb  1 21:54 tags
+</span></code></pre></div></div>
+
+<h2 id="making-things-seem-more-command-like">Making things seem more “command-like”</h2>
+
+<p>It won’t do to have to have to invoke <code class="language-plaintext highlighter-rouge">PipePy</code> every time we want to customize
+a command. It would be nice for</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ls_l</span> <span class="o">=</span> <span class="n">PipePy</span><span class="p">(</span><span class="s">'ls'</span><span class="p">,</span> <span class="s">'-l'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">ls_l</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>to be equivalent to</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ls</span> <span class="o">=</span> <span class="n">PipePy</span><span class="p">(</span><span class="s">'ls'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">ls</span><span class="p">(</span><span class="s">'-l'</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>In other words, we want</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">PipePy</span><span class="p">(</span><span class="s">'ls'</span><span class="p">,</span> <span class="s">'-l'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>to be equivalent to</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">PipePy</span><span class="p">(</span><span class="s">'ls'</span><span class="p">)(</span><span class="s">'-l'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Thankfully, the fact that our class creates lazy objects helps us a lot with
+this:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">PipePy</span><span class="p">:</span>
+    <span class="c1"># __init__, etc
+</span>
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">_args</span> <span class="o">+</span> <span class="n">args</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">__class__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+
+<span class="n">ls</span> <span class="o">=</span> <span class="n">PipePy</span><span class="p">(</span><span class="s">'ls'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">ls</span><span class="p">(</span><span class="s">'-l'</span><span class="p">))</span>
+<span class="c1"># &lt;&lt;&lt; total 16
+# ... -rw-r--r-- 1 kbairak kbairak  125 Jan 22 08:53 files.txt
+# ... -rw-r--r-- 1 kbairak kbairak 5425 Feb  1 21:54 main.py
+# ... -rw-r--r-- 1 kbairak kbairak 1838 Feb  1 21:54 tags
+</span></code></pre></div></div>
+
+<h2 id="keyword-arguments">Keyword arguments</h2>
+
+<p>If we wanted to pass more arguments to <code class="language-plaintext highlighter-rouge">ls</code>, we might encounter <code class="language-plaintext highlighter-rouge">--sort=size</code>.
+We can easily do <code class="language-plaintext highlighter-rouge">ls('-l', '--sort=size')</code>. Can we do better?</p>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code> class PipePy:
+<span class="gd">-    def __init__(self, *args):
+</span><span class="gi">+    def __init__(self, *args, **kwargs):
+</span>         self._args = args
+<span class="gi">+        self._kwargs = kwargs
+</span>         self._result = None
+
+     def _evaluate(self):
+         if self._result is not None:
+             return
+<span class="gd">-        self._result = subprocess.run(self._args,
+</span><span class="gi">+        self._result = subprocess.run(self._convert_args(),
+</span>                                       capture_output=True,
+                                       text=True)
+ 
+<span class="gi">+    def _convert_args(self):
++        args = list(self._args)
++        for key, value in self._kwargs.items():
++            key = key.replace('_', '-')
++            args.append(f"--{key}={value}")
++        return args
+</span> 
+<span class="gd">-    def __call__(self, *args):
+</span><span class="gi">+    def __call__(self, *args, **kwargs):
+</span>         args = self._args + args
+<span class="gi">+        kwargs = {**self._kwargs, **kwargs}
+</span><span class="gd">-        return self.__class__(*args)
+</span><span class="gi">+        return self.__class__(*args, **kwargs)
+</span>
+     # returncode, etc
+</code></pre></div></div>
+
+<p>Lets take this out for a spin:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">ls</span><span class="p">(</span><span class="s">'-l'</span><span class="p">))</span>
+<span class="c1"># &lt;&lt;&lt; total 16
+# ... -rw-r--r-- 1 kbairak kbairak  125 Jan 22 08:53 files.txt
+# ... -rw-r--r-- 1 kbairak kbairak 5425 Feb  1 21:54 main.py
+# ... -rw-r--r-- 1 kbairak kbairak 1838 Feb  1 21:54 tags
+</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">ls</span><span class="p">(</span><span class="s">'-l'</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="s">"size"</span><span class="p">))</span>
+<span class="c1"># &lt;&lt;&lt; total 16
+# ... -rw-r--r-- 1 kbairak kbairak 5425 Feb  1 21:54 main.py
+# ... -rw-r--r-- 1 kbairak kbairak 1838 Feb  1 21:54 tags
+# ... -rw-r--r-- 1 kbairak kbairak  125 Jan 22 08:53 files.txt
+</span></code></pre></div></div>
+
+<h2 id="piping">Piping</h2>
+
+<p>Things start to get interesting. Our final goal is to be able to do:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ls</span> <span class="o">=</span> <span class="n">PipePy</span><span class="p">(</span><span class="s">'ls'</span><span class="p">)</span>
+<span class="n">grep</span> <span class="o">=</span> <span class="n">PipePy</span><span class="p">(</span><span class="s">'grep'</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">ls</span> <span class="o">|</span> <span class="n">grep</span><span class="p">(</span><span class="s">'tags'</span><span class="p">))</span>
+<span class="c1"># &lt;&lt;&lt; tags
+</span></code></pre></div></div>
+
+<p>Our process is:</p>
+
+<ol>
+  <li>Make our <code class="language-plaintext highlighter-rouge">__init__</code> and <code class="language-plaintext highlighter-rouge">__call__</code> methods accept a new <code class="language-plaintext highlighter-rouge">_pipe_input</code>
+keyword-only argument which we will save on <code class="language-plaintext highlighter-rouge">self</code></li>
+  <li>During evaluation, if this <code class="language-plaintext highlighter-rouge">_pipe_input</code> is set, it will be passed to
+<code class="language-plaintext highlighter-rouge">subprocess.run</code> as the <code class="language-plaintext highlighter-rouge">input</code> argument.</li>
+  <li>Override the <code class="language-plaintext highlighter-rouge">__or__</code> method to pass the outcome of the left operand as the
+pipe input to the right operand</li>
+</ol>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code> class PipePy:
+<span class="gd">-    def __init__(self, *args, **kwargs):
+</span><span class="gi">+    def __init__(self, *args, _pipe_input=None, **kwargs):
+</span>         self._args = args
+         self._kwargs = kwargs
+<span class="gi">+        self._pipe_input = _pipe_input
+</span>         self._result = None
+ 
+<span class="gd">-    def __call__(self, *args, **kwargs):
+</span><span class="gi">+    def __call__(self, *args, _pipe_input=None, **kwargs):
+</span>         args = self._args + args
+         kwargs = {**self._kwargs, **kwargs}
+<span class="gd">-        return self.__class__(*args, **kwargs)
+</span><span class="gi">+        return self.__class__(*args, _pipe_input=_pipe_input, **kwargs)
+</span> 
+     def _evaluate(self):
+         if self._result is not None:
+             return
+         self._result = subprocess.run(self._convert_args(),
+<span class="gi">+                                      input=self._pipe_input,
+</span>                                       capture_output=True,
+                                       text=True)
+ 
+<span class="gi">+    def __or__(left, right):
++        return right(_pipe_input=left.stdout)
+</span></code></pre></div></div>
+
+<p>Lets try this out (slightly modifying the command from before to prove this
+actually works):</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ls</span> <span class="o">=</span> <span class="n">PipePy</span><span class="p">(</span><span class="s">'ls'</span><span class="p">)</span>
+<span class="n">grep</span> <span class="o">=</span> <span class="n">PipePy</span><span class="p">(</span><span class="s">'grep'</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">ls</span><span class="p">(</span><span class="s">'-l'</span><span class="p">)</span> <span class="o">|</span> <span class="n">grep</span><span class="p">(</span><span class="s">'tags'</span><span class="p">))</span>
+<span class="c1"># &lt;&lt;&lt; -rw-r--r-- 1 kbairak kbairak 1838 Feb  1 21:54 tags
+</span></code></pre></div></div>
+
+<h2 id="lets-add-a-few-easy-goodies">Lets add a few easy goodies</h2>
+
+<ol>
+  <li>
+    <p>Truthiness:</p>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">PipePy</span><span class="p">:</span>
+    <span class="c1"># __init__, etc
+</span>
+    <span class="k">def</span> <span class="nf">__bool__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span>
+</code></pre></div>    </div>
+
+    <p>Now we can do:</p>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">git</span> <span class="o">=</span> <span class="n">PipePy</span><span class="p">(</span><span class="s">'git'</span><span class="p">)</span>
+<span class="n">grep</span> <span class="o">=</span> <span class="n">PipePy</span><span class="p">(</span><span class="s">'grep'</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">git</span><span class="p">(</span><span class="s">'branch'</span><span class="p">)</span> <span class="o">|</span> <span class="n">grep</span><span class="p">(</span><span class="s">'my_feature'</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"Branch 'my_feature' found"</span><span class="p">)</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Read from/write to files:</p>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">PipePy</span><span class="p">:</span>
+    <span class="c1"># __init__, etc
+</span>
+    <span class="k">def</span> <span class="nf">__gt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">'w'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">stdout</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__rshift__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">'a'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">stdout</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__lt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="n">_pipe_input</span><span class="o">=</span><span class="n">f</span><span class="p">.</span><span class="n">read</span><span class="p">())</span>
+</code></pre></div>    </div>
+
+    <p>Now we can do:</p>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ls</span> <span class="o">=</span> <span class="n">PipePy</span><span class="p">(</span><span class="s">'ls'</span><span class="p">)</span>
+<span class="n">grep</span> <span class="o">=</span> <span class="n">PipePy</span><span class="p">(</span><span class="s">'grep'</span><span class="p">)</span>
+<span class="n">cat</span> <span class="o">=</span> <span class="n">PipePy</span><span class="p">(</span><span class="s">'cat'</span><span class="p">)</span>
+
+<span class="n">ls</span> <span class="o">&gt;</span> <span class="s">'files.txt'</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">grep</span><span class="p">(</span><span class="s">'main'</span><span class="p">)</span> <span class="o">&lt;</span> <span class="s">'files.txt'</span><span class="p">)</span>
+<span class="c1"># &lt;&lt;&lt; main.py
+</span>
+<span class="n">ls</span> <span class="o">&gt;&gt;</span> <span class="s">'files.txt'</span>
+<span class="k">print</span><span class="p">(</span><span class="n">cat</span><span class="p">(</span><span class="s">'files.txt'</span><span class="p">))</span>
+<span class="c1"># &lt;&lt;&lt; files.txt
+# ... main.py
+# ... tags
+# ... files.txt
+# ... main.py
+# ... tags
+</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Iterations:</p>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">PipePy</span><span class="p">:</span>
+    <span class="c1"># __init__, etc
+</span>
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">stdout</span><span class="p">.</span><span class="n">split</span><span class="p">())</span>
+</code></pre></div>    </div>
+
+    <p>Now we can do:</p>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ls</span> <span class="o">=</span> <span class="n">PipePy</span><span class="p">(</span><span class="s">'ls'</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">ls</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">.</span><span class="n">upper</span><span class="p">())</span>
+<span class="c1"># &lt;&lt;&lt; FILES.TXT
+# ... MAIN.PY
+# ... TAGS
+</span></code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Tables:</p>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">PipePy</span><span class="p">:</span>
+    <span class="c1"># __init__, etc
+</span>
+    <span class="k">def</span> <span class="nf">as_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">stdout</span><span class="p">.</span><span class="n">splitlines</span><span class="p">()</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">split</span><span class="p">()</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">line</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="n">maxsplit</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">fields</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)):</span>
+                <span class="n">item</span><span class="p">[</span><span class="n">fields</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="n">result</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+</code></pre></div>    </div>
+
+    <p>Now we can do:</p>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ps</span> <span class="o">=</span> <span class="n">PipePy</span><span class="p">(</span><span class="s">'ps'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">ps</span><span class="p">)</span>
+<span class="c1"># &lt;&lt;&lt;     PID TTY          TIME CMD
+# ...    4205 pts/4    00:00:00 zsh
+# ...   13592 pts/4    00:00:22 ptipython
+# ...   16253 pts/4    00:00:00 ps
+</span><span class="n">ps</span><span class="p">.</span><span class="n">as_table</span><span class="p">()</span>
+<span class="c1"># &lt;&lt;&lt; [{'PID': '4205', 'TTY': 'pts/4', 'TIME': '00:00:00', 'CMD': 'zsh'},
+# ...  {'PID': '13592', 'TTY': 'pts/4', 'TIME': '00:00:22', 'CMD': 'ptipython'},
+# ...  {'PID': '16208', 'TTY': 'pts/4', 'TIME': '00:00:00', 'CMD': 'ps'}]
+</span></code></pre></div>    </div>
+  </li>
+</ol>
+
+<h2 id="things-start-to-get-dangerous-or-making-things-seem-more-shell-like">Things start to get dangerous (or making things seem more shell-like)</h2>
+
+<p>This whole <code class="language-plaintext highlighter-rouge">print(ls)</code> business is getting annoying. If I am in an interactive
+shell, I want to be able to to simply type <code class="language-plaintext highlighter-rouge">ls</code> and be done with it. Well…</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">PipePy</span><span class="p">:</span>
+    <span class="c1"># __init__, etc
+</span>
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">stdout</span> <span class="o">+</span> <span class="bp">self</span><span class="p">.</span><span class="n">stderr</span>
+</code></pre></div></div>
+
+<p>(Interactive shell)</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&gt;&gt;&gt; ls = PipePy('ls')
+&gt;&gt;&gt; ls
+files.txt
+main.py
+tags
+</code></pre></div></div>
+
+<p>Ok, but as the title suggests, things have started to get dangerous. Our
+instances are lazy, meaning that they will be evaluated if and when we are
+interested in their result, and not again after that. What if we simply want to
+make sure that the action is performed? For example, suppose we have this
+script:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">pipepy</span> <span class="kn">import</span> <span class="n">PipePy</span>
+<span class="n">tar</span> <span class="o">=</span> <span class="n">PipePy</span><span class="p">(</span><span class="s">'tar'</span><span class="p">)</span>
+<span class="n">tar</span><span class="p">(</span><span class="s">'-xf'</span><span class="p">,</span> <span class="s">'some_archive'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"File extracted"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>This script will not actually do anything because the <code class="language-plaintext highlighter-rouge">tar</code> call is not
+actually evaluated. I think a nice convention would be to make <code class="language-plaintext highlighter-rouge">__call__</code> force
+an evaluation if invoked without arguments:</p>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code> class PipePy:
+     def __call__(self, *args, _pipe_input=None, **kwargs):
+         args = self._args + args
+         kwargs = {**self._kwargs, **kwargs}
+<span class="gd">-        return self.__class__(*args, _pipe_input=_pipe_input, **kwargs)
+</span><span class="gi">+        result = self.__class__(*args, _pipe_input=_pipe_input, **kwargs)
++        if not args and not _pipe_input and not kwargs:
++            result._evaluate()
++        return result
+</span></code></pre></div></div>
+
+<p>So, when we are scripting, if we want to ensure that a command is actually
+invoked, we <strong>have to</strong> invoke it with a pair of parentheses.</p>
+
+<p>But, we are not out of the woods yet. Consider this:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">date</span> <span class="o">=</span> <span class="n">PipePy</span><span class="p">(</span><span class="s">'date'</span><span class="p">)</span>
+<span class="n">date</span>
+<span class="c1"># &lt;&lt;&lt; Mon Feb  1 10:43:08 PM EET 2021
+</span>
+<span class="c1"># Wait 5 seconds
+</span>
+<span class="n">date</span>
+<span class="c1"># &lt;&lt;&lt; Mon Feb  1 10:43:08 PM EET 2021
+</span></code></pre></div></div>
+
+<p>Oh no! The date hasn’t changed. It makes sense. The <code class="language-plaintext highlighter-rouge">date</code> object keeps its
+<code class="language-plaintext highlighter-rouge">_result</code> in memory. Subsequent evaluations won’t actually invoke the command,
+but simply return the stored value.</p>
+
+<p>One solution would be to force a creation of a copy by invoking with empty
+parentheses:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">date</span> <span class="o">=</span> <span class="n">PipePy</span><span class="p">(</span><span class="s">'date'</span><span class="p">)</span>
+<span class="n">date</span><span class="p">()</span>
+<span class="c1"># &lt;&lt;&lt; Mon Feb  1 10:45:09 PM EET 2021
+</span>
+<span class="c1"># Wait 5 seconds
+</span>
+<span class="n">date</span><span class="p">()</span>
+<span class="c1"># &lt;&lt;&lt; Mon Feb  1 10:45:14 PM EET 2021
+</span></code></pre></div></div>
+
+<p>Another solution is this: instances returned by the <code class="language-plaintext highlighter-rouge">PipePy</code> constructor will
+not supposed to be lazy, but instances returned by a <code class="language-plaintext highlighter-rouge">__call__</code> invocation will
+be.</p>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code> class PipePy:
+<span class="gd">-    def __init__(self, *args, _pipe_input=None, **kwargs):
+</span><span class="gi">+    def __init__(self, *args, _pipe_input=None, _lazy=False, **kwargs):
+</span>         self._args = args
+         self._kwargs = kwargs
+         self._pipe_input = _pipe_input
+<span class="gi">+        self._lazy = _lazy
+</span>         self._result = None
+ 
+     def __call__(self, *args, _pipe_input=None, **kwargs):
+         args = self._args + args
+         kwargs = {**self._kwargs, **kwargs}
+<span class="gd">-        result = self.__class__(*args, _pipe_input=_pipe_input, **kwargs)
+</span><span class="gi">+        result = self.__class__(*args,
++                                _pipe_input=_pipe_input,
++                                _lazy=True,
++                                **kwargs)
+</span>         if not args and not _pipe_input and not kwargs:
+             result._evaluate()
+         return result
+ 
+     def _evaluate(self):
+<span class="gd">-        if self._result is not None:
+</span><span class="gi">+        if self._result is not None and self._lazy:
+</span>             return
+         self._result = subprocess.run(self._convert_args(),
+                                       input=self._pipe_input,
+                                       capture_output=True,
+                                       text=True)
+</code></pre></div></div>
+
+<p>Taking it out for a spin:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">date</span> <span class="o">=</span> <span class="n">PipePy</span><span class="p">(</span><span class="s">'date'</span><span class="p">)</span>
+<span class="n">date</span>
+<span class="c1"># &lt;&lt;&lt; Mon Feb  1 10:54:09 PM EET 2021
+</span>
+<span class="c1"># Wait 5 seconds
+</span>
+<span class="n">date</span>
+<span class="c1"># &lt;&lt;&lt; Mon Feb  1 10:54:14 PM EET 2021
+</span></code></pre></div></div>
+
+<p>and predictably, using the return value of an empty invocation will have the
+previous behavior:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">date</span> <span class="o">=</span> <span class="n">PipePy</span><span class="p">(</span><span class="s">'date'</span><span class="p">)</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">date</span><span class="p">()</span>
+<span class="n">d</span>
+<span class="c1"># &lt;&lt;&lt; Mon Feb  1 10:56:21 PM EET 2021
+</span>
+<span class="c1"># Wait 5 seconds
+</span>
+<span class="n">d</span>
+<span class="c1"># &lt;&lt;&lt; Mon Feb  1 10:56:21 PM EET 2021
+</span></code></pre></div></div>
+
+<p>but that’s ok. You wouldn’t expect <code class="language-plaintext highlighter-rouge">d</code> to update its value.</p>
+
+<h2 id="dangerouser-and-dangerouser">Dangerouser and dangerouser</h2>
+
+<p>Ok, <code class="language-plaintext highlighter-rouge">ls('-l')</code> is not bad, but it would be nice if we could simply do <code class="language-plaintext highlighter-rouge">ls -l</code>
+like human beings. Hmm, I have an idea:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">PipePy</span><span class="p">:</span>
+    <span class="c1"># __init__, etc
+</span>
+    <span class="k">def</span> <span class="nf">__sub__</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">left</span><span class="p">(</span><span class="s">f"-</span><span class="si">{</span><span class="n">right</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>So, now we can do:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ls</span> <span class="o">=</span> <span class="n">PipePy</span><span class="p">(</span><span class="s">'ls'</span><span class="p">)</span>
+<span class="n">ls</span> <span class="o">-</span> <span class="s">'l'</span>
+<span class="c1"># &lt;&lt;&lt; total 16
+# ... -rw-r--r-- 1 kbairak kbairak   46 Feb  1 23:04 files.txt
+# ... -rw-r--r-- 1 kbairak kbairak 5425 Feb  1 21:54 main.py
+# ... -rw-r--r-- 1 kbairak kbairak 1838 Feb  1 21:54 tags
+</span></code></pre></div></div>
+
+<p>And we are one step away from:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">l</span> <span class="o">=</span> <span class="s">'l'</span>
+<span class="n">ls</span> <span class="o">-</span><span class="n">l</span>
+</code></pre></div></div>
+
+<p>and now I just can’t help myself:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">string</span>
+<span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">string</span><span class="p">.</span><span class="n">ascii_letters</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">char</span> <span class="ow">in</span> <span class="nb">locals</span><span class="p">():</span>
+        <span class="k">continue</span>
+    <span class="nb">locals</span><span class="p">()[</span><span class="n">char</span><span class="p">]</span> <span class="o">=</span> <span class="n">char</span>
+
+<span class="k">class</span> <span class="nc">PipePy</span><span class="p">:</span>
+    <span class="c1"># __init__, etc
+</span></code></pre></div></div>
+
+<h2 id="more-dangerousness">More dangerousness!!!</h2>
+
+<p>Playing with <code class="language-plaintext highlighter-rouge">locals()</code> gave me an idea (ominous music). Why should we have to
+instantiate <code class="language-plaintext highlighter-rouge">PipePy</code> all the time? Can’t we <em>find</em> all executables in our path
+and create PipePy instances out of them? Silly question, of course we can!</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">stat</span>
+
+<span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">os</span><span class="p">.</span><span class="n">get_exec_path</span><span class="p">():</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">except</span> <span class="nb">FileNotFoundError</span><span class="p">:</span>
+        <span class="k">continue</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">locals</span><span class="p">():</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="s">'x'</span> <span class="ow">in</span> <span class="n">stat</span><span class="p">.</span><span class="n">filemode</span><span class="p">(</span><span class="n">os</span><span class="p">.</span><span class="n">lstat</span><span class="p">(</span><span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">name</span><span class="p">)).</span><span class="n">st_mode</span><span class="p">):</span>
+            <span class="nb">locals</span><span class="p">()[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">PipePy</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>So now, put everything we have in a python file and script away (this is a
+transcription of an actual bash script):</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">pipepy</span> <span class="kn">import</span> <span class="n">mysqladmin</span><span class="p">,</span> <span class="n">sleep</span><span class="p">,</span> <span class="n">drush</span><span class="p">,</span> <span class="n">grep</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">mysqladmin</span><span class="p">(</span><span class="s">'ping'</span><span class="p">,</span>
+                  <span class="n">host</span><span class="o">=</span><span class="s">"mysql_drupal7"</span><span class="p">,</span>
+                  <span class="n">user</span><span class="o">=</span><span class="s">"user"</span><span class="p">,</span>
+                  <span class="n">password</span><span class="o">=</span><span class="s">"password"</span><span class="p">):</span>
+        <span class="k">break</span>
+    <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)()</span>  <span class="c1"># Remember to actually invoke
+</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">drush</span><span class="p">(</span><span class="s">'status'</span><span class="p">,</span> <span class="s">'bootstrap'</span><span class="p">)</span> <span class="o">|</span> <span class="n">grep</span><span class="p">(</span><span class="s">'-q'</span><span class="p">,</span> <span class="s">'Successful'</span><span class="p">):</span>
+    <span class="n">drush</span><span class="p">(</span><span class="s">'-y'</span><span class="p">,</span> <span class="s">'site-install'</span><span class="p">,</span> <span class="s">'standard'</span><span class="p">,</span>
+          <span class="n">db_url</span><span class="o">=</span><span class="s">"mysql://user:password@mysql_drupal7:3306/drupal"</span><span class="p">,</span>
+          <span class="n">acount_pass</span><span class="o">=</span><span class="s">"kbairak"</span><span class="p">)()</span>  <span class="c1"># Remember to actually invoke
+</span>
+<span class="n">drush</span><span class="p">(</span><span class="s">'en'</span><span class="p">,</span> <span class="s">'tmgmt_ui'</span><span class="p">,</span> <span class="s">'tmgmt_entity_ui'</span><span class="p">,</span> <span class="s">'tmgmt_node_ui'</span><span class="p">)()</span>
+</code></pre></div></div>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Well, I had a lot of fun with this. To be honest, I am probably too scared to
+actually use it, but who knows?</p>
+
+
+  </div><a class="u-url" href="/programming/python/2021/02/01/messing-with-the-python-shell.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">kbairak&#39;s blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">kbairak&#39;s blog</li><li><a class="u-email" href="mailto:ikijob@gmail.com">ikijob@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/kbairak"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">kbairak</span></a></li><li><a href="https://www.twitter.com/kbairak"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">kbairak</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>Mostly programming tips and tutorials, mostly in Python. But who knows? I may rumble about other things as well.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
