@@ -11,7 +11,9 @@ A lot of people hate bash scripting. Every time I have to do even the simplest
 thing, I have to look up the documentation. How to I forward a function's
 arguments to a child command? How do I assign a string to a variable and then
 call that string as a command? How do I check if two string variables are
-equal? How do I split a string into two and get the latter? etc
+equal? How do I split a string and get the latter part? etc. It's not that I
+can't find the answers to these, but I have to look them up each and every
+time.
 
 However, you can't deny the power of having entire programs act as mere
 functions and how natural it is to pipe a program's output into another program.
@@ -144,7 +146,7 @@ We can easily do `ls('-l', '--sort=size')`. Can we do better?
                                        text=True)
  
 +    def _convert_args(self):
-+        args = list(self._args)
++        args = [str(arg) for arg in self._args]
 +        for key, value in self._kwargs.items():
 +            key = key.replace('_', '-')
 +            args.append(f"--{key}={value}")
@@ -356,6 +358,27 @@ print(ls('-l') | grep('tags'))
    # ...  {'PID': '16208', 'TTY': 'pts/4', 'TIME': '00:00:00', 'CMD': 'ps'}]
    ```
 
+5. Common bash utilities:
+
+   Changing the working directory inside a subprocess will not affect the
+   current script or python shell. Same for changing environment variables. The
+   following is not an addition to `PipePy`, but it's nice-to-have:
+
+   ```python
+   import os
+   cd = os.chdir
+   export = os.environ.__setitem__
+
+   pwd = PipePy('pwd')
+
+   pwd
+   # <<< /home/kbairak/prog/python/pipepy
+
+   cd('..')
+   pwd
+   # <<< /home/kbairak/prog/python
+   ```
+
 ## Things start to get dangerous (or making things seem more shell-like)
 
 This whole `print(ls)` business is getting annoying. If I am in an interactive
@@ -388,7 +411,7 @@ script:
 ```python
 from pipepy import PipePy
 tar = PipePy('tar')
-tar('-xf', 'some_archive')
+tar('-xf', 'some_archive.tar')
 print("File extracted")
 ```
 
@@ -409,7 +432,15 @@ an evaluation if invoked without arguments:
 ```
 
 So, when we are scripting, if we want to ensure that a command is actually
-invoked, we **have to** invoke it with a pair of parentheses.
+invoked, we **have to** invoke it with a pair of parentheses:
+
+```diff
+ from pipepy import PipePy
+ tar = PipePy('tar')
+-tar('-xf', 'some_archive.tar')
++tar('-xf', 'some_archive.tar')()
+ print("File extracted")
+```
 
 But, we are not out of the woods yet. Consider this:
 
@@ -556,7 +587,7 @@ class PipePy:
 
 Playing with `locals()` gave me an idea (ominous music). Why should we have to
 instantiate `PipePy` all the time? Can't we _find_ all executables in our path
-and create PipePy instances out of them? Silly question, of course we can!
+and create `PipePy` instances out of them? Silly question, of course we can!
 
 ```python
 import os

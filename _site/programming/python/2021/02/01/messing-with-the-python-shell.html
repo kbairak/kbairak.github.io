@@ -51,7 +51,9 @@
 thing, I have to look up the documentation. How to I forward a function’s
 arguments to a child command? How do I assign a string to a variable and then
 call that string as a command? How do I check if two string variables are
-equal? How do I split a string into two and get the latter? etc</p>
+equal? How do I split a string and get the latter part? etc. It’s not that I
+can’t find the answers to these, but I have to look them up each and every
+time.</p>
 
 <p>However, you can’t deny the power of having entire programs act as mere
 functions and how natural it is to pipe a program’s output into another program.
@@ -176,7 +178,7 @@ We can easily do <code class="language-plaintext highlighter-rouge">ls('-l', '--
                                        text=True)
  
 <span class="gi">+    def _convert_args(self):
-+        args = list(self._args)
++        args = [str(arg) for arg in self._args]
 +        for key, value in self._kwargs.items():
 +            key = key.replace('_', '-')
 +            args.append(f"--{key}={value}")
@@ -383,6 +385,27 @@ actually works):</p>
 # ...  {'PID': '16208', 'TTY': 'pts/4', 'TIME': '00:00:00', 'CMD': 'ps'}]
 </span></code></pre></div>    </div>
   </li>
+  <li>
+    <p>Common bash utilities:</p>
+
+    <p>Changing the working directory inside a subprocess will not affect the
+current script or python shell. Same for changing environment variables. The
+following is not an addition to <code class="language-plaintext highlighter-rouge">PipePy</code>, but it’s nice-to-have:</p>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">os</span>
+<span class="n">cd</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">chdir</span>
+<span class="n">export</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">environ</span><span class="p">.</span><span class="n">__setitem__</span>
+
+<span class="n">pwd</span> <span class="o">=</span> <span class="n">PipePy</span><span class="p">(</span><span class="s">'pwd'</span><span class="p">)</span>
+
+<span class="n">pwd</span>
+<span class="c1"># &lt;&lt;&lt; /home/kbairak/prog/python/pipepy
+</span>
+<span class="n">cd</span><span class="p">(</span><span class="s">'..'</span><span class="p">)</span>
+<span class="n">pwd</span>
+<span class="c1"># &lt;&lt;&lt; /home/kbairak/prog/python
+</span></code></pre></div>    </div>
+  </li>
 </ol>
 
 <h2 id="things-start-to-get-dangerous-or-making-things-seem-more-shell-like">Things start to get dangerous (or making things seem more shell-like)</h2>
@@ -414,7 +437,7 @@ script:</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">pipepy</span> <span class="kn">import</span> <span class="n">PipePy</span>
 <span class="n">tar</span> <span class="o">=</span> <span class="n">PipePy</span><span class="p">(</span><span class="s">'tar'</span><span class="p">)</span>
-<span class="n">tar</span><span class="p">(</span><span class="s">'-xf'</span><span class="p">,</span> <span class="s">'some_archive'</span><span class="p">)</span>
+<span class="n">tar</span><span class="p">(</span><span class="s">'-xf'</span><span class="p">,</span> <span class="s">'some_archive.tar'</span><span class="p">)</span>
 <span class="k">print</span><span class="p">(</span><span class="s">"File extracted"</span><span class="p">)</span>
 </code></pre></div></div>
 
@@ -434,7 +457,14 @@ an evaluation if invoked without arguments:</p>
 </span></code></pre></div></div>
 
 <p>So, when we are scripting, if we want to ensure that a command is actually
-invoked, we <strong>have to</strong> invoke it with a pair of parentheses.</p>
+invoked, we <strong>have to</strong> invoke it with a pair of parentheses:</p>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code> from pipepy import PipePy
+ tar = PipePy('tar')
+<span class="gd">-tar('-xf', 'some_archive.tar')
+</span><span class="gi">+tar('-xf', 'some_archive.tar')()
+</span> print("File extracted")
+</code></pre></div></div>
 
 <p>But, we are not out of the woods yet. Consider this:</p>
 
@@ -572,7 +602,7 @@ like human beings. Hmm, I have an idea:</p>
 
 <p>Playing with <code class="language-plaintext highlighter-rouge">locals()</code> gave me an idea (ominous music). Why should we have to
 instantiate <code class="language-plaintext highlighter-rouge">PipePy</code> all the time? Can’t we <em>find</em> all executables in our path
-and create PipePy instances out of them? Silly question, of course we can!</p>
+and create <code class="language-plaintext highlighter-rouge">PipePy</code> instances out of them? Silly question, of course we can!</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">stat</span>
