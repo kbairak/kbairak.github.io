@@ -5,6 +5,9 @@ date:   2021-02-01 21:00:00 +0300
 categories: programming python
 ---
 
+_Update: I went to town with this idea and now this has emerged as a
+[full project](https://github.com/kbairak/pipepy)!_
+
 ## Intro
 
 A lot of people hate bash scripting. Every time I have to do even the simplest
