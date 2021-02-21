@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Shell auto-completion using python | kbairak’s blog</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Shell auto-completion using python" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="My latest blog post acted as inspiration for my most ambitious open-source library yet: PipePy. Part of this library is pymake, a command line program that aims to replace GNU make, but with the makefiles written in Python. As I was polishing the whole thing, I started wondering if there was a way to add shell autocompletion for it, with the shell offering different options based on the current makefile’s targets." />
+<meta property="og:description" content="My latest blog post acted as inspiration for my most ambitious open-source library yet: PipePy. Part of this library is pymake, a command line program that aims to replace GNU make, but with the makefiles written in Python. As I was polishing the whole thing, I started wondering if there was a way to add shell autocompletion for it, with the shell offering different options based on the current makefile’s targets." />
+<link rel="canonical" href="https://kbairak.github.io/programming/python/2021/02/21/shell-autocompletion-using-python.html" />
+<meta property="og:url" content="https://kbairak.github.io/programming/python/2021/02/21/shell-autocompletion-using-python.html" />
+<meta property="og:site_name" content="kbairak’s blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-02-21T20:00:00+02:00" />
+<script type="application/ld+json">
+{"url":"https://kbairak.github.io/programming/python/2021/02/21/shell-autocompletion-using-python.html","headline":"Shell auto-completion using python","description":"My latest blog post acted as inspiration for my most ambitious open-source library yet: PipePy. Part of this library is pymake, a command line program that aims to replace GNU make, but with the makefiles written in Python. As I was polishing the whole thing, I started wondering if there was a way to add shell autocompletion for it, with the shell offering different options based on the current makefile’s targets.","dateModified":"2021-02-21T20:00:00+02:00","datePublished":"2021-02-21T20:00:00+02:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://kbairak.github.io/programming/python/2021/02/21/shell-autocompletion-using-python.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://kbairak.github.io/feed.xml" title="kbairak's blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">kbairak&#39;s blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Shell auto-completion using python</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2021-02-21T20:00:00+02:00" itemprop="datePublished">Feb 21, 2021
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>My <a href="/programming/python/2021/02/01/messing-with-the-python-shell.html">latest blog post</a> acted as inspiration for my most
+ambitious open-source library yet: <a href="https://github.com/kbairak/pipepy">PipePy</a>. Part of this library is
+<code class="language-plaintext highlighter-rouge">pymake</code>, a command line program that aims to replace GNU make, but with the
+makefiles written in Python. As I was polishing the whole thing, I started
+wondering if there was a way to add shell autocompletion for it, with the shell
+offering different options based on the current makefile’s targets.</p>
+
+<p>For both <code class="language-plaintext highlighter-rouge">bash</code> and <code class="language-plaintext highlighter-rouge">zsh</code> there are multiple ways to go about this. I will only
+list those that I ended up using myself and that allow using python for
+generating the completions.</p>
+
+<h2 id="bash">bash</h2>
+
+<h3 id="one-way-shell-completion-works-in-bash">One way shell completion works in bash</h3>
+
+<p>In bash, at some point you can run <code class="language-plaintext highlighter-rouge">complete -C command_A command_B</code>. This
+tells bash the following:</p>
+
+<blockquote>
+  <p>When the user wants to get auto-complete suggestions for <strong>command_B</strong>, run
+<code class="language-plaintext highlighter-rouge">command_A command_B &lt;last_word&gt; &lt;second_to_last_word&gt;</code> and use each line of
+its output as completion suggestions</p>
+</blockquote>
+
+<p>So, for example, lets assume the user types:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>→ <span class="nb">complete</span> <span class="nt">-C</span> command_A command_B
+→ command_B hello abc&lt;Tab&gt;
+</code></pre></div></div>
+
+<p>bash will run:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>→ command_A command_B abc hello
+</code></pre></div></div>
+
+<p>If <code class="language-plaintext highlighter-rouge">command_A</code> returns:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>abcdef
+</code></pre></div></div>
+
+<p>then bash will complete the missing ‘def’ to the shell</p>
+
+<p>If <code class="language-plaintext highlighter-rouge">command_A</code> returns:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>abcdef
+abc123
+</code></pre></div></div>
+
+<p>then bash will offer both completions as suggestions.</p>
+
+<h3 id="do-it-with-python">Do it with Python</h3>
+
+<p>So, we need a way for the user to set up auto-completion without having to know
+the intricacies of how it works. For setting things up, we can create a command
+that outputs something like <code class="language-plaintext highlighter-rouge">complete -C command_A command_B</code> that they can
+wrap with <code class="language-plaintext highlighter-rouge">eval $(...)</code>. Then we need to provide a command to play the role of
+<code class="language-plaintext highlighter-rouge">command_A</code> from our example.</p>
+
+<p>Fortunately, we don’t have to pollute the user’s path with lots of executables;
+if they have <code class="language-plaintext highlighter-rouge">pymake</code> installed, then they can simply run <code class="language-plaintext highlighter-rouge">eval $(pymake
+--setup-bash-completion)</code>, which will run <code class="language-plaintext highlighter-rouge">complete -C 'pymake --complete-bash'
+pymake</code>. Then, as promised, <code class="language-plaintext highlighter-rouge">pymake --complete-bash</code> will generate completion
+options for <code class="language-plaintext highlighter-rouge">pymake</code>:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># setup.cfg
+[options.entry_points]
+console_scripts =
+    pymake = pipepy.pymake:pymake
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># pipepy/pymake.py
+</span><span class="k">def</span> <span class="nf">pymake</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">_pymake_complete</span><span class="p">(</span><span class="o">*</span><span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+        <span class="k">return</span>
+    <span class="c1"># Run actual pymake code
+</span>    <span class="p">...</span>
+
+<span class="k">def</span> <span class="nf">_pymake_complete</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">args</span> <span class="ow">and</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">"--setup-bash-completion"</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"complete -C 'pymake --complete-bash' pymake"</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">args</span> <span class="ow">and</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">"--complete-bash"</span><span class="p">:</span>
+        <span class="c1"># TODO
+</span>        <span class="k">print</span><span class="p">(</span><span class="s">"option 1"</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"option 2"</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"option 3"</span><span class="p">)</span>
+    <span class="c1"># More `elif`s ...
+</span>    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span>
+    <span class="k">return</span> <span class="bp">True</span>
+</code></pre></div></div>
+
+<p>Here is the output of <code class="language-plaintext highlighter-rouge">pymake --setup-bash-completion</code></p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>→ pymake <span class="nt">--setup-bash-completion</span>
+<span class="nb">complete</span> <span class="nt">-C</span> <span class="s1">'pymake --complete-bash'</span> pymake
+</code></pre></div></div>
+
+<p>Now we need to fill the body of the <code class="language-plaintext highlighter-rouge">elif</code> part with actual suggestions for
+<code class="language-plaintext highlighter-rouge">pymake</code>. The suggestions we want are the names of the make targets, which
+means that we want all top-level functions defined in the <code class="language-plaintext highlighter-rouge">Makefile.py</code> module
+in the current directory:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># pipepy/pymake.py
+</span><span class="n">Makefile</span> <span class="o">=</span> <span class="bp">None</span>
+
+<span class="k">def</span> <span class="nf">_pymake_complete</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">args</span> <span class="ow">and</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">"--setup-bash-completion"</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"complete -C 'pymake --complete-bash' pymake"</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">args</span> <span class="ow">and</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">"--complete-bash"</span><span class="p">:</span>
+        <span class="c1"># imports the local Makefile.py file and assigns it to the global
+</span>        <span class="c1"># `Makefile` variable
+</span>        <span class="n">_load_makefile</span><span class="p">()</span>
+        <span class="n">word</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>  <span class="c1"># This is where bash will put the word being completed
+</span>        <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">Makefile</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">attr</span><span class="p">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">word</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="n">func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">Makefile</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">callable</span><span class="p">(</span><span class="n">func</span><span class="p">)</span> <span class="ow">or</span>
+                    <span class="nb">getattr</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="s">'__module__'</span><span class="p">,</span> <span class="s">''</span><span class="p">)</span> <span class="o">!=</span> <span class="s">"Makefile"</span><span class="p">):</span>
+                <span class="c1"># Only functions and only if they were defined in Makefile.py,
+</span>                <span class="c1"># not imported from somewhere else
+</span>                <span class="k">continue</span>
+            <span class="n">result</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
+    <span class="c1"># More `elif`s ...
+</span>    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span>
+    <span class="k">return</span> <span class="bp">True</span>
+</code></pre></div></div>
+
+<p>Here is how the result looks:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[kbairak@kbairakdelllaptop pipepy]$ pymake &lt;TAB&gt;&lt;TAB&gt;
+build      clean      debugtest  publish    watchtest
+checks     covtest    html       test
+</code></pre></div></div>
+
+<h2 id="zsh">zsh</h2>
+
+<h3 id="one-way-shell-completion-works-in-zsh">One way shell completion works in zsh</h3>
+
+<p>Similarly to bash, you can type the following in zsh: <code class="language-plaintext highlighter-rouge">compdef func command</code>.
+The catch here is that <code class="language-plaintext highlighter-rouge">func</code> has to be a zsh function and instead of using its
+output for the suggestions, <code class="language-plaintext highlighter-rouge">func</code> has to call some zsh-specific builtins that
+instruct zsh on how to perform completion. This is better explained with an
+example:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>→ _pymake<span class="o">()</span> <span class="o">{</span>
+    <span class="nb">local</span> <span class="nt">-a</span> subcmds
+    subcmds <span class="o">=</span> <span class="o">(</span>
+      <span class="s1">'water:water the plants'</span>
+      <span class="s1">'pet:pet the dog'</span>
+    <span class="o">)</span>
+    _describe <span class="s1">'command'</span> subcmds
+  <span class="o">}</span>
+→ compdef _pymake pymake
+</code></pre></div></div>
+
+<p>The nice thing that zsh offers is that, apart from offering completions, it can
+offer descriptions of each option. So if, after the previous snippet, you type
+<code class="language-plaintext highlighter-rouge">pymake &lt;TAB&gt;</code>, you will see something like this:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>→ pymake &lt;TAB&gt;
+water  <span class="nt">--</span> water the plants
+pet    <span class="nt">--</span> pet the dog
+</code></pre></div></div>
+
+<h3 id="do-it-with-python-1">Do it with Python</h3>
+
+<p>The problem with how zsh does things is that the <code class="language-plaintext highlighter-rouge">_pymake</code> function from the
+previous example must be written in zsh code and not in Python. We can, and
+will, get around this with <code class="language-plaintext highlighter-rouge">eval</code> again. Our goal is to be able to again offer
+the user the option of running <code class="language-plaintext highlighter-rouge">eval $(pymake --setup-zsh-completion)</code> and have
+everything taken care of.</p>
+
+<p>Here is our python code for making this possible:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">_pymake_complete</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">args</span> <span class="ow">and</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">"--setup-bash-completion"</span><span class="p">:</span>
+        <span class="p">...</span>
+    <span class="k">elif</span> <span class="n">args</span> <span class="ow">and</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">"--complete-bash"</span><span class="p">:</span>
+        <span class="p">...</span>
+    <span class="k">elif</span> <span class="n">args</span> <span class="ow">and</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">"--setup-zsh-completion"</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"_pymake() { eval $(pymake --complete-zsh) }; "</span>
+              <span class="s">"compdef _pymake pymake"</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">args</span> <span class="ow">and</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">"--complete-zsh"</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="s">"""
+            local -a subcmds;
+            subcmds=(
+                'water:water the plants'
+                'pet:pet the dog'
+            );
+            _describe 'command' subcmds
+        """</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">" "</span><span class="p">.</span><span class="n">join</span><span class="p">((</span><span class="n">line</span><span class="p">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">result</span><span class="p">.</span><span class="n">splitlines</span><span class="p">())))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span>
+    <span class="k">return</span> <span class="bp">True</span>
+</code></pre></div></div>
+
+<p>Here is the output of <code class="language-plaintext highlighter-rouge">pymake --setup-zsh-completion</code></p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>→ pymake <span class="nt">--setup-zsh-completion</span>
+_pymake<span class="o">()</span> <span class="o">{</span> <span class="nb">eval</span> <span class="si">$(</span>pymake <span class="nt">--complete-zsh</span><span class="si">)</span> <span class="o">}</span><span class="p">;</span> compdef _pymake pymake
+</code></pre></div></div>
+
+<p>Now its time to fill in the code that generates the actual suggestions. Since
+zsh gives us the option of providing the descriptions of the suggestions, we
+are going to use the functions’ docstrings, if available:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">_pymake_complete</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">args</span> <span class="ow">and</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">"--setup-bash-completion"</span><span class="p">:</span>
+        <span class="p">...</span>
+    <span class="k">elif</span> <span class="n">args</span> <span class="ow">and</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">"--complete-bash"</span><span class="p">:</span>
+        <span class="p">...</span>
+    <span class="k">elif</span> <span class="n">args</span> <span class="ow">and</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">"--setup-zsh-completion"</span><span class="p">:</span>
+        <span class="p">...</span>
+    <span class="k">elif</span> <span class="n">args</span> <span class="ow">and</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">"--complete-zsh"</span><span class="p">:</span>
+        <span class="n">_load_makefile</span><span class="p">()</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="s">"""
+            local -a subcmds;
+            subcmds=(
+        """</span>
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">Makefile</span><span class="p">):</span>
+            <span class="n">func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">Makefile</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">callable</span><span class="p">(</span><span class="n">func</span><span class="p">)</span> <span class="ow">or</span>
+                    <span class="nb">getattr</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="s">'__module__'</span><span class="p">,</span> <span class="s">''</span><span class="p">)</span> <span class="o">!=</span> <span class="s">"Makefile"</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">func</span><span class="p">.</span><span class="n">__doc__</span><span class="p">:</span>
+                <span class="n">doc</span> <span class="o">=</span> <span class="n">func</span><span class="p">.</span><span class="n">__doc__</span>
+                <span class="c1"># Perform escaping
+</span>                <span class="n">doc</span> <span class="o">=</span> <span class="n">doc</span><span class="p">.</span>\
+                    <span class="n">replace</span><span class="p">(</span><span class="s">"'"</span><span class="p">,</span> <span class="s">"</span><span class="se">\\</span><span class="s">'"</span><span class="p">).</span>\
+                    <span class="n">replace</span><span class="p">(</span><span class="s">':'</span><span class="p">,</span> <span class="s">'</span><span class="se">\\</span><span class="s">:'</span><span class="p">).</span>\
+                    <span class="n">replace</span><span class="p">(</span><span class="s">'</span><span class="se">\\</span><span class="s">'</span><span class="p">,</span> <span class="s">'</span><span class="se">\\\\</span><span class="s">'</span><span class="p">)</span>
+                <span class="n">doc</span> <span class="o">=</span> <span class="s">" "</span><span class="p">.</span><span class="n">join</span><span class="p">([</span><span class="n">line</span><span class="p">.</span><span class="n">strip</span><span class="p">()</span>
+                                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">doc</span><span class="p">.</span><span class="n">splitlines</span><span class="p">()</span>
+                                <span class="k">if</span> <span class="n">line</span><span class="p">.</span><span class="n">strip</span><span class="p">()])</span>
+                <span class="n">result</span> <span class="o">+=</span> <span class="s">f" '</span><span class="si">{</span><span class="n">attr</span><span class="si">}</span><span class="s">:</span><span class="si">{</span><span class="n">doc</span><span class="si">}</span><span class="s">'"</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">+=</span> <span class="s">f" '</span><span class="si">{</span><span class="n">attr</span><span class="si">}</span><span class="s">'"</span>
+        <span class="n">result</span> <span class="o">+=</span> <span class="s">"""
+            );
+            _describe 'command' subcmds
+        """</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">" "</span><span class="p">.</span><span class="n">join</span><span class="p">((</span><span class="n">line</span><span class="p">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">result</span><span class="p">.</span><span class="n">splitlines</span><span class="p">())))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span>
+    <span class="k">return</span> <span class="bp">True</span>
+</code></pre></div></div>
+
+<p>And here is the output of <code class="language-plaintext highlighter-rouge">pymake --complete-zsh</code> (adding some newlines to make
+this more readable):</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>→ pymake --complete-zsh
+local -a subcmds;
+subcmds=(
+    'build:Build package'
+    'checks:Run static checks on the code (flake8, isort)'
+    'clean:Clean up build directories'
+    'covtest:Run tests and produce coverge report'
+    'debugtest:Run tests without capturing their output. This makes using an interactive debugger possible'
+    'html:Run tests and open coverage report in browser'
+    'publish:Publish pacage to PyPI'
+    'test:Run tests'
+    'watchtest:Automatically run tests when a source file changes'
+);
+_describe 'command' subcmds
+</code></pre></div></div>
+
+<p><em>(A reminder here that this output will be different depending on which folder
+we are running it from and the contents of the local <code class="language-plaintext highlighter-rouge">Makefile.py</code> file)</em></p>
+
+<p>So, after all this, we can get the following lovely auto-completion from
+pymake (if run at the same folder as PipePy’s source code):</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>→ pymake &lt;TAB&gt;
+build      -- Build package
+checks     -- Run static checks on the code (flake8, isort)
+clean      -- Clean up build directories
+covtest    -- Run tests and produce coverge report
+debugtest  -- Run tests without capturing their output. This makes using an interactive debugger possible
+html       -- Run tests and open coverage report in browser
+publish    -- Publish pacage to PyPI
+test       -- Run tests
+watchtest  -- Automatically run tests when a source file changes
+</code></pre></div></div>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Python works a lot better than bash or zsh scripts when you have to tackle
+complex logic (this is the main reason behind the development of the PipePy
+library in general), so it’s nice that we have an option to write the
+auto-completion in Python. Plus, in this example, it was a requirement, since
+in order to be able to provide suggestions, we <strong>have</strong> to import the
+<code class="language-plaintext highlighter-rouge">Makefile.py</code> module first.</p>
+
+<p>The nice thing is that, despite all the underlying complexity, the only thing
+the user has to be instructed to do, is to run
+<code class="language-plaintext highlighter-rouge">eval $(pymake --setup-bash-completion)</code> or
+<code class="language-plaintext highlighter-rouge">eval $(pymake --setup-zsh-completion)</code> or put it at the end of their <code class="language-plaintext highlighter-rouge">.bashrc</code>
+or <code class="language-plaintext highlighter-rouge">.zshrc</code> and they’re good to go!</p>
+
+
+  </div><a class="u-url" href="/programming/python/2021/02/21/shell-autocompletion-using-python.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">kbairak&#39;s blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">kbairak&#39;s blog</li><li><a class="u-email" href="mailto:ikijob@gmail.com">ikijob@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/kbairak"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">kbairak</span></a></li><li><a href="https://www.twitter.com/kbairak"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">kbairak</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>Mostly programming tips and tutorials, mostly in Python. But who knows? I may rumble about other things as well.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
