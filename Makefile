@@ -1,13 +1,13 @@
 install:
 	bundle install
 
-serve: install
+serve:
 	bundle exec jekyll serve
 
-reloadserve: install
+reloadserve:
 	bundle exec jekyll serve --livereload
 
-draftreloadserve: install
+draftreloadserve:
 	bundle exec jekyll serve --livereload --drafts
 
 build:
