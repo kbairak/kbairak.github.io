@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Only dumb components should have CSS in React | kbairak’s blog</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Only dumb components should have CSS in React" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="This is going to be my first React-related post. Recently I have been involved with a big full-stack project and we decided to go with a single-page-application for its frontend, built with React. React is a beautiful library but anyone with experience can tell you that with any project larger than what would suit a tutorial, developers have the freedom to choose between a million different paths. This is fine, of course, but it means that it can get difficult for a team to cooperate effectively, especially if a team member stumbles across a big codebase that someone else has started working on." />
+<meta property="og:description" content="This is going to be my first React-related post. Recently I have been involved with a big full-stack project and we decided to go with a single-page-application for its frontend, built with React. React is a beautiful library but anyone with experience can tell you that with any project larger than what would suit a tutorial, developers have the freedom to choose between a million different paths. This is fine, of course, but it means that it can get difficult for a team to cooperate effectively, especially if a team member stumbles across a big codebase that someone else has started working on." />
+<link rel="canonical" href="https://kbairak.github.io/programming/react/2023/02/19/only-dumb-components-should-have-css-in-react.html" />
+<meta property="og:url" content="https://kbairak.github.io/programming/react/2023/02/19/only-dumb-components-should-have-css-in-react.html" />
+<meta property="og:site_name" content="kbairak’s blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2023-02-19T18:00:00+02:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Only dumb components should have CSS in React" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2023-02-19T18:00:00+02:00","datePublished":"2023-02-19T18:00:00+02:00","description":"This is going to be my first React-related post. Recently I have been involved with a big full-stack project and we decided to go with a single-page-application for its frontend, built with React. React is a beautiful library but anyone with experience can tell you that with any project larger than what would suit a tutorial, developers have the freedom to choose between a million different paths. This is fine, of course, but it means that it can get difficult for a team to cooperate effectively, especially if a team member stumbles across a big codebase that someone else has started working on.","headline":"Only dumb components should have CSS in React","mainEntityOfPage":{"@type":"WebPage","@id":"https://kbairak.github.io/programming/react/2023/02/19/only-dumb-components-should-have-css-in-react.html"},"url":"https://kbairak.github.io/programming/react/2023/02/19/only-dumb-components-should-have-css-in-react.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://kbairak.github.io/feed.xml" title="kbairak&apos;s blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">kbairak&#39;s blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Only dumb components should have CSS in React</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2023-02-19T18:00:00+02:00" itemprop="datePublished">Feb 19, 2023
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>This is going to be my first React-related post. Recently I have been involved
+with a big full-stack project and we decided to go with a
+single-page-application for its frontend, built with React. React is a
+beautiful library but anyone with experience can tell you that with any project
+larger than what would suit a tutorial, developers have the freedom to choose
+between a million different paths. This is fine, of course, but it means that
+it can get difficult for a team to cooperate effectively, especially if a team
+member stumbles across a big codebase that someone else has started working on.</p>
+
+<p>After having some experience with this issue, I have a proposal that I hope can
+help teams deal with this issue. This all boils down to a single “guideline”:</p>
+
+<blockquote>
+  <p>Components that deal with CSS should have <strong>no state</strong></p>
+</blockquote>
+
+<p>This sentence might seem arbitrary. Also it seems that it won’t be able to
+solve many problems since it still allows a lot of freedom to choose a path at
+any given intersection during the development of the project. However, I feel
+that it will subtly guide you to good practices and maintainable code.</p>
+
+<p>Let’s dive into this sentence a bit. “No state” does not mean 100% dumb (as
+opposed to what the title suggests). These components can have conditional
+logic, but it will always be based on their props. Also, there’s no restriction
+on stateless components (with CSS) to render stateful components.</p>
+
+<p>Let’s look into this guideline, first with a simple example:</p>
+
+<blockquote>
+  <h3 id="detour">Detour</h3>
+
+  <p>I am going to be using <a href="https://react-query-v3.tanstack.com/">react-query</a> in
+my examples. <code class="language-plaintext highlighter-rouge">react-query</code> has a lot of features including caching, polling,
+retrying etc, but for the requirements of my example, just know that this:</p>
+</blockquote>
+
+<blockquote>
+  <div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">App</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="p">{</span> <span class="nx">isError</span><span class="p">,</span> <span class="nx">isLoading</span><span class="p">,</span> <span class="nx">data</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">useQuery</span><span class="p">([</span><span class="dl">'</span><span class="s1">data</span><span class="dl">'</span><span class="p">],</span> <span class="k">async</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">response</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">fetch</span><span class="p">(...);</span>
+    <span class="k">return</span> <span class="p">(</span><span class="k">await</span> <span class="nx">response</span><span class="p">.</span><span class="nx">json</span><span class="p">).</span><span class="nx">data</span><span class="p">;</span>
+  <span class="p">});</span>
+
+  <span class="k">return</span> <span class="p">...;</span>
+<span class="p">}</span>
+</code></pre></div>  </div>
+
+  <p>will be equivalent to this:</p>
+
+  <div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">App</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="p">[</span><span class="nx">isError</span><span class="p">,</span> <span class="nx">setIsError</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+  <span class="kd">const</span> <span class="p">[</span><span class="nx">isLoading</span><span class="p">,</span> <span class="nx">setIsLoading</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+  <span class="kd">const</span> <span class="p">[</span><span class="nx">data</span><span class="p">,</span> <span class="nx">setData</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="p">([]);</span>
+  <span class="nx">useEffect</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="k">async</span> <span class="kd">function</span> <span class="nx">_getData</span><span class="p">()</span> <span class="p">{</span>
+      <span class="k">try</span> <span class="p">{</span>
+        <span class="kd">const</span> <span class="nx">response</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">fetch</span><span class="p">(...);</span>
+        <span class="nx">setData</span><span class="p">((</span><span class="k">await</span> <span class="nx">response</span><span class="p">.</span><span class="nx">json</span><span class="p">()).</span><span class="nx">data</span><span class="p">);</span>
+      <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">setIsError</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+      <span class="p">}</span>
+      <span class="nx">setIsLoading</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="nx">_getData</span><span class="p">();</span>
+  <span class="p">},</span> <span class="p">[]);</span>
+
+  <span class="k">return</span> <span class="p">...;</span>
+<span class="p">}</span>
+</code></pre></div>  </div>
+
+  <p>And this:</p>
+
+  <div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">App</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="p">{</span> <span class="nx">mutate</span><span class="p">,</span> <span class="nx">isIdle</span><span class="p">,</span> <span class="nx">isError</span><span class="p">,</span> <span class="nx">isLoading</span><span class="p">,</span> <span class="nx">isSuccess</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">useMutation</span><span class="p">(</span>
+    <span class="p">(</span><span class="nx">choiceId</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">fetch</span><span class="p">(...,</span> <span class="p">{</span> <span class="na">method</span><span class="p">:</span> <span class="dl">'</span><span class="s1">POST</span><span class="dl">'</span> <span class="p">}),</span>
+  <span class="p">);</span>
+
+  <span class="k">return</span> <span class="p">...;</span>
+<span class="p">}</span>
+</code></pre></div>  </div>
+
+  <p>will be equivalent to this:</p>
+
+  <div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">App</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="p">[</span><span class="nx">isIdle</span><span class="p">,</span> <span class="nx">setIsIdle</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+  <span class="kd">const</span> <span class="p">[</span><span class="nx">isError</span><span class="p">,</span> <span class="nx">setIsError</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+  <span class="kd">const</span> <span class="p">[</span><span class="nx">isLoading</span><span class="p">,</span> <span class="nx">setIsLoading</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+  <span class="kd">const</span> <span class="p">[</span><span class="nx">isSuccess</span><span class="p">,</span> <span class="nx">setIsSuccess</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+  <span class="k">async</span> <span class="kd">function</span> <span class="nx">mutate</span><span class="p">(</span><span class="nx">choiceId</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">setIsIdle</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+    <span class="nx">setIsLoading</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+    <span class="k">try</span> <span class="p">{</span>
+      <span class="k">await</span> <span class="nx">fetch</span><span class="p">(...,</span> <span class="p">{</span> <span class="na">method</span><span class="p">:</span> <span class="dl">'</span><span class="s1">POST</span><span class="dl">'</span> <span class="p">});</span>
+    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">setIsError</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+      <span class="nx">setIsLoading</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+      <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nx">setIsLoading</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+    <span class="nx">setIsSuccess</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="p">...</span>
+<span class="p">}</span>
+</code></pre></div>  </div>
+
+  <p>In essence, react-query abstracts some tedious things you have to do when
+fetching data from a backend or pushing changes to the backend.</p>
+</blockquote>
+
+<h2 id="a-simple-example">A simple example</h2>
+
+<p>We are going to build an application that fetches a list of options from the
+backend, presents them to the user and submits the user’s choice back to the
+backend. Let’s assume that the more-backend-savvy-frontend engineer puts their
+hands to the task first. They may do something like this:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">export</span> <span class="k">default</span> <span class="kd">function</span> <span class="nx">App</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="p">{</span>
+    <span class="na">isError</span><span class="p">:</span> <span class="nx">isQueryError</span><span class="p">,</span>
+    <span class="na">isLoading</span><span class="p">:</span> <span class="nx">isQueryLoading</span><span class="p">,</span>
+    <span class="na">data</span><span class="p">:</span> <span class="nx">choices</span><span class="p">,</span>
+  <span class="p">}</span> <span class="o">=</span> <span class="nx">useQuery</span><span class="p">(</span>
+    <span class="p">[</span><span class="dl">'</span><span class="s1">choices</span><span class="dl">'</span><span class="p">],</span>
+    <span class="k">async</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="kd">const</span> <span class="nx">response</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">fetch</span><span class="p">(...);</span>
+      <span class="k">return</span> <span class="p">(</span><span class="k">await</span> <span class="nx">response</span><span class="p">.</span><span class="nx">json</span><span class="p">()).</span><span class="nx">data</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">);</span>
+  <span class="kd">const</span> <span class="p">{</span>
+    <span class="na">mutate</span><span class="p">:</span> <span class="nx">handleChoice</span><span class="p">,</span>
+    <span class="na">isIdle</span><span class="p">:</span> <span class="nx">isMutationIdle</span><span class="p">,</span>
+    <span class="na">isError</span><span class="p">:</span> <span class="nx">isMutationError</span><span class="p">,</span>
+    <span class="na">isLoading</span><span class="p">:</span> <span class="nx">isMutationLoading</span><span class="p">,</span>
+    <span class="na">isSuccess</span><span class="p">:</span> <span class="nx">isMutationSuccess</span><span class="p">,</span>
+  <span class="p">}</span> <span class="o">=</span> <span class="nx">useMutation</span><span class="p">((</span><span class="nx">choiceId</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">fetch</span><span class="p">(...,</span> <span class="p">{</span> <span class="na">method</span><span class="p">:</span> <span class="dl">'</span><span class="s1">POST</span><span class="dl">'</span> <span class="p">}));</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="nx">isQueryError</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="dl">'</span><span class="s1">Error!!!</span><span class="dl">'</span><span class="p">;</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">isQueryLoading</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="dl">'</span><span class="s1">Loading...</span><span class="dl">'</span><span class="p">;</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">isMutationIdle</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span>
+      <span class="o">&lt;</span><span class="nx">ul</span><span class="o">&gt;</span>
+        <span class="p">{</span><span class="nx">choices</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">choice</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span>
+          <span class="o">&lt;</span><span class="nx">li</span> <span class="nx">key</span><span class="o">=</span><span class="p">{</span><span class="nx">choice</span><span class="p">.</span><span class="nx">id</span><span class="p">}</span><span class="o">&gt;</span>
+            <span class="o">&lt;</span><span class="nx">button</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{()</span> <span class="o">=&gt;</span> <span class="nx">handleChoice</span><span class="p">(</span><span class="nx">choice</span><span class="p">.</span><span class="nx">id</span><span class="p">)}</span><span class="o">&gt;</span>
+              <span class="p">{</span><span class="nx">choice</span><span class="p">.</span><span class="nx">name</span><span class="p">}</span>
+            <span class="o">&lt;</span><span class="sr">/button</span><span class="err">&gt;
+</span>          <span class="o">&lt;</span><span class="sr">/li</span><span class="err">&gt;
+</span>        <span class="p">))}</span>
+      <span class="o">&lt;</span><span class="sr">/ul</span><span class="err">&gt;
+</span>    <span class="p">);</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">isMutationError</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="dl">'</span><span class="s1">Error!!!</span><span class="dl">'</span><span class="p">;</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">isMutationLoading</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="dl">'</span><span class="s1">Saving...</span><span class="dl">'</span><span class="p">;</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">isMutationSuccess</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="dl">'</span><span class="s1">Saved!!!</span><span class="dl">'</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>This is a fully functional component that uses the simplest HTML possible. The
+function’s body is dedicated to the component’s functionality only. It’s
+relatively easy for someone to understand the logic here. If the
+more-design-savvy-frontend-engineer comes along and starts adding CSS-related
+code, the size of this component can quickly get big and someone coming into
+this codebase later will have a hard time following what’s going on. How can
+the the backend-savvy engineer prepare the ground for the design-savvy
+engineer to get into the project and add styling, without affecting the <code class="language-plaintext highlighter-rouge">App</code>
+component’s clarity?</p>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code> export default function App() {
+   const {
+     isError: isQueryError,
+     isLoading: isQueryLoading,
+     data: choices,
+   } = useQuery(
+     ['choices'],
+     async () =&gt; {
+       const response = await fetch(...);
+       return (await response.json()).data;
+     }
+   );
+   const {
+     mutate: handleChoice,
+     isIdle: isMutationIdle,
+     isError: isMutationError,
+     isLoading: isMutationLoading,
+     isSuccess: isMutationSuccess,
+   } = useMutation((choiceId) =&gt; fetch(..., { method: 'POST' }));
+<span class="gi">+ 
++  let body;
+</span>   if (isQueryError) {
+<span class="gd">-    return 'Error!!!';
+</span><span class="gi">+    body = &lt;Error /&gt;;
+</span>   } else if (isQueryLoading) {
+<span class="gd">-    return 'Loading...';
+</span><span class="gi">+    body = &lt;Spinner /&gt;;
+</span>   } else if (isMutationIdle) {
+<span class="gd">-    return (
+</span><span class="gi">+    body = (
+</span><span class="gd">-      &lt;ul&gt;
+</span><span class="gi">+      &lt;ChoiceList&gt;
+</span>         {choices.map((choice) =&gt; (
+<span class="gd">-          &lt;li key={choice.id}&gt;
+-            &lt;button onClick={() =&gt; handleChoice(choice.id)}&gt;
+-              {choice.name}
+-            &lt;/button&gt;
+-          &lt;/li&gt;
+</span><span class="gi">+          &lt;ChoiceList.Item
++            key={choice.id}
++            choice={choice}
++            onSelect={() =&gt; handleChoice(choice.id)} /&gt;
+</span>         ))}
+<span class="gd">-      &lt;/ul&gt;
+</span><span class="gi">+      &lt;/ChoiceList&gt;
+</span>     );
+   } else if (isMutationError) {
+<span class="gd">-    return 'Error!!!';
+</span><span class="gi">+    body = &lt;Error /&gt;;
+</span>   } else if (isMutationLoading) {
+<span class="gd">-    return 'Saving...';
+</span><span class="gi">+    body = &lt;Spinner /&gt;;
+</span>   } else if (isMutationSuccess) {
+<span class="gd">-    return 'Saved!!!'
+</span><span class="gi">+    body = &lt;Success /&gt;;
+</span>   }
+<span class="gi">+
++  return &lt;PageWrapper&gt;{body}&lt;/PageWrapper&gt;
+</span> }
+<span class="gi">+ 
++function PageWrapper({ children }) {
++  // Lots of fancy CSS directives to render a nice container for the whole app
++  return children;
++}
++
++function Error() {
++  // Lots of fancy CSS directives to produce a nice error message
++  return 'Error!!!';
++}
++
++function Spinner() {
++  // Lots of fancy CSS directives to produce a nice spinner
++  return 'Loading...';
++}
++
++function ChoiceList({ children }) {
++  // Lots of fancy CSS directives to produce a fancy container for choices
++  return &lt;ul&gt;{children}&lt;/ul&gt;;
++}
++
++ChoiceList.Item = function({ choice, onSelect }) {
++  // Lots of fancy CSS directives to produce a choice and attach the callback
++  // that will occur when the user selects this particular choice
++  return (
++    &lt;li&gt;
++      &lt;button onClick={onSelect}&gt;{choice.name}&lt;/button&gt;
++    &lt;/li&gt;
++  );
++}
++
++function Success() {
++  // Lots of fancy CSS directives to produce a nice success message
++  return 'Saved!!!';
++}
+</span></code></pre></div></div>
+
+<p>The main takeaway is that main <code class="language-plaintext highlighter-rouge">App</code> component retains its clarity - its two
+incarnations are nearly identical. Also, I believe that it will be manageable
+for the design-savvy engineer to add styling to the application.</p>
+
+<p>Let’s take a closer look at <code class="language-plaintext highlighter-rouge">ChoiceList.Item = function({ choice, onSelect })</code>.
+My main hope/goal is that when the design-savvy engineer sees that signature
+(and the naive implementation), they will be able to figure out how to use the
+supplied props.</p>
+
+<p>Now let’s assume that the development goes in a different direction, ie that the
+design-savvy engineer gets their hand on the project before the backend-savvy
+engineer. How would this look like under this new guideline?</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">export</span> <span class="k">default</span> <span class="kd">function</span> <span class="nx">App</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">choices</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="na">id</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Choice 1</span><span class="dl">'</span><span class="p">},</span>
+    <span class="p">{</span><span class="na">id</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Choice 2</span><span class="dl">'</span><span class="p">},</span>
+    <span class="p">{</span><span class="na">id</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Choice 3</span><span class="dl">'</span><span class="p">},</span>
+    <span class="p">{</span><span class="na">id</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Choice 4</span><span class="dl">'</span><span class="p">},</span>
+  <span class="p">];</span>
+
+  <span class="kd">function</span> <span class="nx">handleChoice</span><span class="p">(</span><span class="nx">choiceId</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="s2">`Choice </span><span class="p">${</span><span class="nx">choiceId</span><span class="p">}</span><span class="s2"> selected`</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="p">(</span>
+    <span class="o">&lt;</span><span class="nx">PageWrapper</span><span class="o">&gt;</span>
+      <span class="o">&lt;</span><span class="nx">ChoiceList</span><span class="o">&gt;</span>
+        <span class="p">{</span><span class="nx">choices</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">choice</span><span class="p">)</span> <span class="o">=&gt;</span>
+          <span class="o">&lt;</span><span class="nx">ChoiceList</span><span class="p">.</span><span class="nx">Item</span>
+            <span class="nx">key</span><span class="o">=</span><span class="p">{</span><span class="nx">choice</span><span class="p">.</span><span class="nx">id</span><span class="p">}</span>
+            <span class="nx">choice</span><span class="o">=</span><span class="p">{</span><span class="nx">choice</span><span class="p">}</span>
+            <span class="nx">onSelect</span><span class="o">=</span><span class="p">{()</span> <span class="o">=&gt;</span> <span class="nx">handleChoice</span><span class="p">(</span><span class="nx">choice</span><span class="p">.</span><span class="nx">id</span><span class="p">)}</span> <span class="sr">/</span><span class="err">&gt;
+</span>        <span class="p">)}</span>
+      <span class="o">&lt;</span><span class="sr">/ChoiceList</span><span class="err">&gt;
+</span>    <span class="o">&lt;</span><span class="sr">/PageWrapper</span><span class="err">&gt;
+</span>  <span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">PageWrapper</span><span class="p">({</span> <span class="nx">children</span> <span class="p">})</span> <span class="p">{</span>
+  <span class="c1">// Lots of fancy CSS to render a nice container for the whole app</span>
+  <span class="k">return</span> <span class="p">...;</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">ChoiceList</span><span class="p">({</span> <span class="nx">children</span> <span class="p">})</span> <span class="p">{</span>
+  <span class="c1">// Lots of fancy CSS directives to produce a fancy container for choices, eg</span>
+  <span class="k">return</span> <span class="p">...;</span>
+<span class="p">}</span>
+
+<span class="nx">ChoiceList</span><span class="p">.</span><span class="nx">Item</span> <span class="o">=</span> <span class="kd">function</span><span class="p">({</span> <span class="nx">choice</span><span class="p">,</span> <span class="nx">onSelect</span> <span class="p">})</span> <span class="p">{</span>
+  <span class="c1">// Lots of fancy CSS directives to produce a choice and attach the callback</span>
+  <span class="c1">// that will occur when the user selects this particular choice</span>
+  <span class="k">return</span> <span class="p">...;</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nb">Error</span><span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// Lots of fancy CSS directives to produce a nice error message</span>
+  <span class="k">return</span> <span class="p">...;</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">Spinner</span><span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// Lots of fancy CSS directives to produce a nice spinner</span>
+  <span class="k">return</span> <span class="p">...;</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">Success</span><span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// Lots of fancy CSS directives to produce a nice success message</span>
+  <span class="k">return</span> <span class="p">...;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>So, here the design-savvy engineer has not implemented any state or any of
+the interactions with the server, instead they use mock data. However, they
+<strong>anticipated</strong> where these would go, namely the <code class="language-plaintext highlighter-rouge">App</code> component, and kept all
+CSS out of it. Now, when the backend-savvy engineer comes along, they will be
+able to replace the mock data with the actual state the application will need
+in order to function properly. The final incarnation of the application will be
+the same in both cases.</p>
+
+<h2 id="a-more-complete-example">A more complete example</h2>
+
+<p>Earlier I said that the problems with react arise when the application is
+larger than what would suit a tutorial, then I proceeded to demonstrate such an
+application. You can stop reading here if you want. However, in order to better
+make my point I will demonstrate my guideline with a larger application.</p>
+
+<p>Let’s build a UI for placing orders. This will be implemented as a 3-step wizard.
+In the first step the user will choose which products to order, in the second
+step they will supply their address and in the third step they will review and
+submit the order. We will follow the backend-savvy-first approach. Let’s get
+started:</p>
+
+<h3 id="the-main-component">The main component</h3>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">export</span> <span class="k">default</span> <span class="kd">function</span> <span class="nx">App</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="p">[</span><span class="nx">step</span><span class="p">,</span> <span class="nx">setStep</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+  <span class="k">return</span> <span class="p">(</span>
+    <span class="o">&lt;&gt;</span>
+      <span class="p">{</span><span class="nx">step</span> <span class="o">===</span> <span class="mi">1</span> <span class="o">&amp;&amp;</span> <span class="o">&lt;</span><span class="nx">Step1</span> <span class="nx">onComplete</span><span class="o">=</span><span class="p">{()</span> <span class="o">=&gt;</span> <span class="nx">setStep</span><span class="p">(</span><span class="mi">2</span><span class="p">)}</span> <span class="sr">/&gt;</span><span class="err">}
+</span>      <span class="p">{</span><span class="nx">step</span> <span class="o">===</span> <span class="mi">2</span> <span class="o">&amp;&amp;</span> <span class="o">&lt;</span><span class="nx">Step2</span> <span class="nx">onComplete</span><span class="o">=</span><span class="p">{()</span> <span class="o">=&gt;</span> <span class="nx">setStep</span><span class="p">(</span><span class="mi">3</span><span class="p">)}</span> <span class="sr">/&gt;</span><span class="err">}
+</span>      <span class="p">{</span><span class="nx">step</span> <span class="o">===</span> <span class="mi">3</span> <span class="o">&amp;&amp;</span> <span class="o">&lt;</span><span class="nx">Step3</span> <span class="o">/&gt;</span><span class="p">}</span>
+    <span class="o">&lt;</span><span class="sr">/</span><span class="err">&gt;
+</span>  <span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">Step1</span><span class="p">({</span> <span class="nx">onComplete</span> <span class="p">})</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">(</span>
+    <span class="o">&lt;&gt;</span>
+      <span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="nx">This</span> <span class="nx">is</span> <span class="nx">step</span> <span class="mi">1</span><span class="o">&lt;</span><span class="sr">/p</span><span class="err">&gt;
+</span>      <span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;&lt;</span><span class="nx">button</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{</span><span class="nx">onComplete</span><span class="p">}</span><span class="o">&gt;</span><span class="nx">Next</span> <span class="nx">step</span><span class="o">&lt;</span><span class="sr">/button&gt;&lt;/</span><span class="nx">p</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="sr">/</span><span class="err">&gt;
+</span>  <span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">Step2</span><span class="p">({</span> <span class="nx">onComplete</span> <span class="p">})</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">(</span>
+    <span class="o">&lt;&gt;</span>
+      <span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="nx">This</span> <span class="nx">is</span> <span class="nx">step</span> <span class="mi">2</span><span class="o">&lt;</span><span class="sr">/p</span><span class="err">&gt;
+</span>      <span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;&lt;</span><span class="nx">button</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{</span><span class="nx">onComplete</span><span class="p">}</span><span class="o">&gt;</span><span class="nx">Next</span> <span class="nx">step</span><span class="o">&lt;</span><span class="sr">/button&gt;&lt;/</span><span class="nx">p</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="sr">/</span><span class="err">&gt;
+</span>  <span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">Step3</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="nx">This</span> <span class="nx">is</span> <span class="nx">step</span> <span class="mi">3</span><span class="o">&lt;</span><span class="sr">/p&gt;</span><span class="err">;
+</span><span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="step-1---product-list">Step 1 - Product list</h3>
+
+<p>Now let’s display the products while adding pagination to the mix:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Simple awaitable function to cause a delay in order to simulate fetching data</span>
+<span class="c1">// from the server</span>
+<span class="kd">function</span> <span class="nx">sleep</span><span class="p">(</span><span class="nx">delay</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="k">new</span> <span class="nb">Promise</span><span class="p">((</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">_</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">setTimeout</span><span class="p">(</span><span class="nx">resolve</span><span class="p">,</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">delay</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">10</span><span class="p">));</span>
+  <span class="p">});</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">Step1</span><span class="p">({</span> <span class="nx">onComplete</span> <span class="p">})</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="p">[</span><span class="nx">page</span><span class="p">,</span> <span class="nx">setPage</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+  <span class="kd">const</span> <span class="p">{</span> <span class="nx">isError</span><span class="p">,</span> <span class="nx">isLoading</span><span class="p">,</span> <span class="na">data</span><span class="p">:</span> <span class="nx">products</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">useQuery</span><span class="p">(</span>
+    <span class="p">[</span><span class="dl">'</span><span class="s1">products</span><span class="dl">'</span><span class="p">,</span> <span class="nx">page</span><span class="p">],</span>
+    <span class="k">async</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="k">await</span> <span class="nx">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+        <span class="k">return</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">].</span><span class="nx">map</span><span class="p">((</span><span class="nx">i</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">({</span>
+          <span class="na">id</span><span class="p">:</span> <span class="p">(</span><span class="nx">page</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">5</span> <span class="o">+</span> <span class="nx">i</span><span class="p">,</span>
+          <span class="na">name</span><span class="p">:</span> <span class="s2">`Product </span><span class="p">${(</span><span class="nx">page</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">5</span> <span class="o">+</span> <span class="nx">i</span><span class="p">}</span><span class="s2">`</span><span class="p">,</span>
+          <span class="na">amount</span><span class="p">:</span> <span class="mi">100</span> <span class="o">+</span> <span class="p">((</span><span class="nx">page</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">5</span> <span class="o">+</span> <span class="nx">i</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="p">}));</span>
+    <span class="p">},</span>
+  <span class="p">);</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="nx">isError</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="dl">'</span><span class="s1">Error!!!</span><span class="dl">'</span><span class="p">;</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">isLoading</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="dl">'</span><span class="s1">Loading...</span><span class="dl">'</span><span class="p">;</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span>
+      <span class="o">&lt;&gt;</span>
+        <span class="o">&lt;</span><span class="nx">ul</span><span class="o">&gt;</span>
+          <span class="p">{</span><span class="nx">products</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span>
+            <span class="p">(</span><span class="nx">product</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="o">&lt;</span><span class="nx">li</span> <span class="nx">key</span><span class="o">=</span><span class="p">{</span><span class="nx">product</span><span class="p">.</span><span class="nx">id</span><span class="p">}</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">product</span><span class="p">.</span><span class="nx">name</span><span class="p">}</span> <span class="o">-</span> <span class="p">{</span><span class="nx">product</span><span class="p">.</span><span class="nx">amount</span><span class="p">}</span><span class="nx">$</span><span class="o">&lt;</span><span class="sr">/li</span><span class="err">&gt;
+</span>          <span class="p">)}</span>
+        <span class="o">&lt;</span><span class="sr">/ul</span><span class="err">&gt;
+</span>        <span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span>
+          <span class="p">{</span><span class="nx">page</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="o">&amp;&amp;</span>
+            <span class="o">&lt;&gt;</span>
+              <span class="o">&lt;</span><span class="nx">button</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{()</span> <span class="o">=&gt;</span> <span class="nx">setPage</span><span class="p">((</span><span class="nx">page</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">page</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)}</span><span class="o">&gt;</span><span class="nx">Previous</span> <span class="nx">page</span><span class="o">&lt;</span><span class="sr">/button</span><span class="err">&gt;
+</span>              <span class="p">{</span><span class="dl">'</span><span class="s1"> | </span><span class="dl">'</span><span class="p">}</span>
+            <span class="o">&lt;</span><span class="sr">/&gt;</span><span class="err">}
+</span>            <span class="nx">Page</span> <span class="p">{</span><span class="nx">page</span><span class="p">}</span>
+            <span class="p">{</span><span class="dl">'</span><span class="s1"> | </span><span class="dl">'</span><span class="p">}</span>
+            <span class="o">&lt;</span><span class="nx">button</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{()</span> <span class="o">=&gt;</span> <span class="nx">setPage</span><span class="p">((</span><span class="nx">page</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">page</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)}</span><span class="o">&gt;</span><span class="nx">Next</span> <span class="nx">page</span><span class="o">&lt;</span><span class="sr">/button</span><span class="err">&gt;
+</span>        <span class="o">&lt;</span><span class="sr">/p</span><span class="err">&gt;
+</span>        <span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;&lt;</span><span class="nx">button</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{</span><span class="nx">onComplete</span><span class="p">}</span><span class="o">&gt;</span><span class="nx">Next</span> <span class="nx">step</span><span class="o">&lt;</span><span class="sr">/button&gt;&lt;/</span><span class="nx">p</span><span class="o">&gt;</span>
+      <span class="o">&lt;</span><span class="sr">/</span><span class="err">&gt;
+</span>    <span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Now let’s support selecting products:</p>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code> function Step1({ onComplete }) {
+   const [page, setPage] = useState(1);
+<span class="gi">+  const [selectedProducts, setSelectedProducts] = useState({});
+</span>   const { isError, isLoading, data: products } = useQuery(
+     ['products', page],
+     async () =&gt; {
+         await sleep(1);
+         return [1, 2, 3, 4, 5].map((i) =&gt; ({
+           id: (page - 1) * 5 + i,
+           name: `Product ${(page - 1) * 5 + i}`,
+           amount: 100 + ((page - 1) * 5 + i) * 10,
+         }));
+     },
+   );
+<span class="gi">+ 
++  function onSelect(product) {
++    setSelectedProducts((selectedProducts) =&gt; {
++      selectedProducts = { ...selectedProducts };  // Make sure this causes a rerender
++      if (product.id in selectedProducts) {
++        delete selectedProducts[product.id];
++      } else {
++        selectedProducts[product.id] = product;
++      }
++      return selectedProducts;
++    });
++  }
++ 
++  const displayProducts = useMemo(() =&gt; (products || []).map(
++    (product) =&gt; ({ selected: product.id in (selectedProducts || {}), ...product }),
++  ), [products, selectedProducts]);
++ 
++  const total = useMemo(() =&gt; Object.values(selectedProducts || []).reduce(
++    (total, product) =&gt; total + product.amount,
++    0,
++  ), [selectedProducts]);
+</span> 
+   if (isError) {
+     return 'Error!!!';
+   } else if (isLoading) {
+     return 'Loading...';
+   } else {
+     return (
+       &lt;&gt;
+<span class="gi">+        &lt;p&gt;
++          You have selected {Object.values(selectedProducts || []).length} products -
++          Total amount: {total}
++        &lt;/p&gt;
+</span>
+-       &lt;ul&gt;
+<span class="gd">-         {products.map(
+-           (product) =&gt; &lt;li key={product.id}&gt;{product.name} - {product.amount}$&lt;/li&gt;
+-         )}
+-       &lt;/ul&gt;
+</span><span class="gi">+        &lt;ul&gt;
++          {displayProducts.map((product) =&gt; (
++            &lt;li key={product.id}&gt;
++              &lt;input
++                type="checkbox"
++                checked={product.selected}
++                onChange={() =&gt; onSelect(product)} /&gt;
++              {product.name} - {product.amount}$
++            &lt;/li&gt;
++          ))}
++        &lt;/ul&gt;
+</span>
+         &lt;p&gt;
+           {page &gt; 1 &amp;&amp;
+             &lt;&gt;
+               &lt;button onClick={() =&gt; setPage((page) =&gt; page - 1)}&gt;Previous page&lt;/button&gt;
+               {' | '}
+             &lt;/&gt;}
+             Page {page}
+             {' | '}
+             &lt;button onClick={() =&gt; setPage((page) =&gt; page + 1)}&gt;Next page&lt;/button&gt;
+         &lt;/p&gt;
+         &lt;p&gt;&lt;button onClick={onComplete}&gt;Next step&lt;/button&gt;&lt;/p&gt;
+       &lt;/&gt;
+     );
+   }
+ }
+</code></pre></div></div>
+
+<p>Quite a few things going on here:</p>
+
+<ol>
+  <li>We keep the selected products in a different state variable which has the
+form <code class="language-plaintext highlighter-rouge">{ productId: product, ... }</code></li>
+  <li>We implement a function that will toggle whether a product is selected or
+not (add or remove it from <code class="language-plaintext highlighter-rouge">selectedProducts</code>)</li>
+  <li>We create a modified list of products with the added <code class="language-plaintext highlighter-rouge">selected</code> field as a
+dependent variable of <code class="language-plaintext highlighter-rouge">products</code> and <code class="language-plaintext highlighter-rouge">selectedProducts</code> (with <code class="language-plaintext highlighter-rouge">useMemo</code>)</li>
+  <li>We create a variable dependent on <code class="language-plaintext highlighter-rouge">selectedProducts</code> to store the current
+total amount of the order (with <code class="language-plaintext highlighter-rouge">useMemo</code>)</li>
+  <li>We display an order summary at the top</li>
+  <li>We render a controlled checkbox for each product, linking it to its
+<code class="language-plaintext highlighter-rouge">selected</code> field and the toggling function</li>
+</ol>
+
+<h3 id="step-2---address">Step 2 - Address</h3>
+
+<p>Let’s move on to the second step. Things are much simpler here:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">Step2</span><span class="p">({</span> <span class="nx">onComplete</span> <span class="p">})</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="p">[</span><span class="nx">address</span><span class="p">,</span> <span class="nx">setAddress</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="p">(</span><span class="dl">''</span><span class="p">);</span>
+  <span class="k">return</span> <span class="p">(</span>
+    <span class="o">&lt;&gt;</span>
+      <span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span>
+        <span class="nx">Your</span> <span class="nx">address</span><span class="p">:</span>
+        <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">value</span><span class="o">=</span><span class="p">{</span><span class="nx">address</span><span class="p">}</span> <span class="nx">onChange</span><span class="o">=</span><span class="p">{(</span><span class="nx">e</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">setAddress</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">value</span><span class="p">)}</span> <span class="sr">/</span><span class="err">&gt;
+</span>      <span class="o">&lt;</span><span class="sr">/p</span><span class="err">&gt;
+</span>      <span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;&lt;</span><span class="nx">button</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{</span><span class="nx">onComplete</span><span class="p">}</span><span class="o">&gt;</span><span class="nx">Next</span> <span class="nx">step</span><span class="o">&lt;</span><span class="sr">/button&gt;&lt;/</span><span class="nx">p</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="sr">/</span><span class="err">&gt;
+</span>  <span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="step-3---summary-and-submit">Step 3 - Summary and submit</h3>
+
+<p>Before moving on to step 3, we have to rethink our state a bit. We want <code class="language-plaintext highlighter-rouge">Step3</code>
+to have access to <code class="language-plaintext highlighter-rouge">selectedProducts</code> and <code class="language-plaintext highlighter-rouge">address</code> in order for it to display
+the summary and place the order. Which means that we will need to “bump” these
+state variables from their respective components to <code class="language-plaintext highlighter-rouge">App</code>:</p>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code> export default function App() {
+   const [step, setStep] = useState(1);
+<span class="gi">+ 
++  const [selectedProducts, setSelectedProducts] = useState({});
++  const [address, setAddress] = useState('');
++ 
++  function onSelectProduct(product) {
++    setSelectedProducts((selectedProducts) =&gt; {
++      selectedProducts = { ...selectedProducts };  // Make sure this causes a rerender
++      if (product.id in selectedProducts) {
++        delete selectedProducts[product.id];
++      } else {
++        selectedProducts[product.id] = product;
++      }
++      return selectedProducts;
++    });
++  }
+</span>
+   return (
+     &lt;&gt;
+<span class="gd">-      {step === 1 &amp;&amp; &lt;Step1 onComplete={() =&gt; setStep(2)} /&gt;}
+</span><span class="gi">+      {step === 1 &amp;&amp;
++        &lt;Step1
++          onComplete={() =&gt; setStep(2)}
++          selectedProducts={selectedProducts}
++          onSelect={onSelectProduct} /&gt;}
+</span><span class="gd">-      {step === 2 &amp;&amp; &lt;Step2 onComplete={() =&gt; setStep(3)} /&gt;}
+</span><span class="gi">+      {step === 2 &amp;&amp;
++        &lt;Step2
++          onComplete={() =&gt; setStep(3)}
++          address={address}
++          setAddress={setAddress} /&gt;}
+</span><span class="gd">-      {step === 3 &amp;&amp; &lt;Step3 /&gt;}
+</span><span class="gi">+      {step === 3 &amp;&amp; &lt;Step3 selectedProducts={selectedProducts} address={address} /&gt;}
+</span>     &lt;/&gt;
+   );
+ }
+<span class="gd">- 
+-function Step1({ onComplete }) {
+</span><span class="gi">+function Step1({ onComplete, selectedProducts, onSelect }) {
+</span>   const [page, setPage] = useState(1);
+<span class="gd">-  const [selectedProducts, setSelectedProducts] = useState({});
+</span>   const { isError, isLoading, data: products } = useQuery(
+     ['products', page],
+     async () =&gt; {
+         await sleep(1);
+         return [1, 2, 3, 4, 5].map((i) =&gt; ({
+           id: (page - 1) * 5 + i,
+           name: `Product ${(page - 1) * 5 + i}`,
+           amount: 100 + ((page - 1) * 5 + i) * 10,
+         }));
+     },
+   );
+<span class="gd">- 
+-  function onSelect(product) {
+-    setSelectedProducts((selectedProducts) =&gt; {
+-      selectedProducts = { ...selectedProducts };  // Make sure this causes a rerender
+-      if (product.id in selectedProducts) {
+-        delete selectedProducts[product.id];
+-      } else {
+-        selectedProducts[product.id] = product;
+-      };
+-      return selectedProducts;
+-    });
+-  }
+</span>
+   const displayProducts = useMemo(() =&gt; (products || []).map(
+     (product) =&gt; ({ selected: product.id in selectedProducts, ...product }),
+   ), [products, selectedProducts]);
+
+   const total = useMemo(() =&gt; Object.values(selectedProducts || []).reduce(
+     (total, product) =&gt; total + product.amount,
+     0,
+   ), [selectedProducts]);
+ 
+   // ...
+ }
+<span class="gd">- 
+-function Step2({ onComplete }) {
+</span><span class="gi">+function Step2({ onComplete, address, setAddress }) {
+</span><span class="gd">-  const [address, setAddress] = useState('');
+</span>   return (
+     &lt;&gt;
+       &lt;p&gt;
+         Your address:
+         &lt;input value={address} onChange={(e) =&gt; setAddress(e.target.value)} /&gt;
+       &lt;/p&gt;
+       &lt;p&gt;
+         &lt;button onClick={onComplete}&gt;Next step&lt;/button&gt;
+       &lt;/p&gt;
+     &lt;/&gt;
+   );
+ }
+</code></pre></div></div>
+
+<p>Now we can move on to step 3:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">Step3</span><span class="p">({</span> <span class="nx">selectedProducts</span><span class="p">,</span> <span class="nx">address</span> <span class="p">})</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="p">{</span> <span class="nx">mutate</span><span class="p">,</span> <span class="nx">isIdle</span><span class="p">,</span> <span class="nx">isError</span><span class="p">,</span> <span class="nx">isLoading</span><span class="p">,</span> <span class="nx">isSuccess</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">useMutation</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="nx">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">));</span>
+
+  <span class="kd">const</span> <span class="nx">total</span> <span class="o">=</span> <span class="nx">useMemo</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">values</span><span class="p">(</span><span class="nx">selectedProducts</span> <span class="o">||</span> <span class="p">[]).</span><span class="nx">reduce</span><span class="p">(</span>
+    <span class="p">(</span><span class="nx">total</span><span class="p">,</span> <span class="nx">product</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">total</span> <span class="o">+</span> <span class="nx">product</span><span class="p">.</span><span class="nx">amount</span><span class="p">,</span>
+    <span class="mi">0</span><span class="p">,</span>
+  <span class="p">),</span> <span class="p">[</span><span class="nx">selectedProducts</span><span class="p">]);</span>
+
+  <span class="k">return</span> <span class="p">(</span>
+    <span class="o">&lt;&gt;</span>
+      <span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="nx">You</span> <span class="nx">have</span> <span class="nx">selected</span> <span class="nx">the</span> <span class="nx">following</span> <span class="nx">products</span><span class="o">&lt;</span><span class="sr">/p</span><span class="err">&gt;
+</span>      <span class="o">&lt;</span><span class="nx">ul</span><span class="o">&gt;</span>
+        <span class="p">{</span><span class="nb">Object</span><span class="p">.</span><span class="nx">values</span><span class="p">(</span><span class="nx">selectedProducts</span> <span class="o">||</span> <span class="p">[]).</span><span class="nx">map</span><span class="p">(</span>
+          <span class="p">(</span><span class="nx">product</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="o">&lt;</span><span class="nx">li</span> <span class="nx">key</span><span class="o">=</span><span class="p">{</span><span class="nx">product</span><span class="p">.</span><span class="nx">id</span><span class="p">}</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">product</span><span class="p">.</span><span class="nx">name</span><span class="p">}</span> <span class="o">-</span> <span class="p">{</span><span class="nx">product</span><span class="p">.</span><span class="nx">amount</span><span class="p">}</span><span class="nx">$</span><span class="o">&lt;</span><span class="sr">/li</span><span class="err">&gt;
+</span>        <span class="p">)}</span>
+      <span class="o">&lt;</span><span class="sr">/ul</span><span class="err">&gt;
+</span>      <span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="nx">Your</span> <span class="nx">address</span> <span class="nx">is</span><span class="p">:</span> <span class="p">{</span><span class="nx">address</span><span class="p">}</span><span class="o">&lt;</span><span class="sr">/p</span><span class="err">&gt;
+</span>      <span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="nx">The</span> <span class="nx">total</span> <span class="nx">amount</span> <span class="nx">is</span><span class="p">:</span> <span class="p">{</span><span class="nx">total</span><span class="p">}</span><span class="nx">$</span><span class="o">&lt;</span><span class="sr">/p</span><span class="err">&gt;
+</span>      <span class="p">{</span><span class="nx">isIdle</span> <span class="o">&amp;&amp;</span> <span class="o">&lt;</span><span class="nx">button</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{</span><span class="nx">mutate</span><span class="p">}</span><span class="o">&gt;</span><span class="nx">Submit</span> <span class="nx">order</span><span class="o">&lt;</span><span class="sr">/button&gt;</span><span class="err">}
+</span>      <span class="p">{</span><span class="nx">isError</span> <span class="o">&amp;&amp;</span> <span class="dl">'</span><span class="s1">Error!!!</span><span class="dl">'</span><span class="p">}</span>
+      <span class="p">{</span><span class="nx">isLoading</span> <span class="o">&amp;&amp;</span> <span class="dl">'</span><span class="s1">Placing order...</span><span class="dl">'</span><span class="p">}</span>
+      <span class="p">{</span><span class="nx">isSuccess</span> <span class="o">&amp;&amp;</span> <span class="dl">'</span><span class="s1">Order placed!!!</span><span class="dl">'</span><span class="p">}</span>
+    <span class="o">&lt;</span><span class="sr">/</span><span class="err">&gt;
+</span>  <span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>You can check the full application <a href="https://codesandbox.io/s/adoring-booth-48veet?file=/src/App.js">here</a></p>
+
+<h3 id="adding-style">Adding style</h3>
+
+<p>So, now it’s time to put my guideline to the test: If we include styling but
+not in any stateful components, can we, at the same time:</p>
+
+<ol>
+  <li>Keep the frontend business logic as clear and readable as it is now</li>
+  <li>Allow us to apply a beautiful style (keeping in mind that I am no designer :p )</li>
+</ol>
+
+<p>By the way, we will be using <a href="https://tailwindcss.com/">tailwind</a> for styling.</p>
+
+<p>Let’s start with a nice header:</p>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code> export default function App() {
+   // ...
+ 
+   return (
+<span class="gd">-    &lt;&gt;
+</span><span class="gi">+    &lt;PageWrapper&gt;
+</span>       {step === 1 &amp;&amp;
+         &lt;Step1
+           onComplete={() =&gt; setStep(2)}
+           selectedProducts={selectedProducts}
+           onSelect={onSelectProduct} /&gt;}
+       {step === 2 &amp;&amp;
+         &lt;Step2
+           onComplete={() =&gt; setStep(3)}
+           address={address}
+           setAddress={setAddress} /&gt;}
+       {step === 3 &amp;&amp; &lt;Step3 selectedProducts={selectedProducts} address={address} /&gt;}
+<span class="gd">-     &lt;/&gt;
+</span><span class="gi">+     &lt;/PageWrapper&gt;
+</span>    );
+ }
+<span class="gi">+ 
++function PageWrapper({ children }) {
++  return (
++    &lt;div className='container mx-auto'&gt;
++      &lt;h1 className='font-serif text-2xl border-b-4'&gt;kbairak's shop&lt;/h1&gt;
++      {children}
++    &lt;/div&gt;
++  );
++}
+</span></code></pre></div></div>
+
+<p>Let’s move on with beefing up step 1</p>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code> function Step1({ onComplete, selectedProducts, onSelect }) {
+   // ...
+<span class="gi">+  let body;
+</span>   if (isError) {
+<span class="gd">-    return 'Error!!!';
+</span><span class="gi">+    body = 'Error!!!';
+</span>   } else if (isLoading) {
+<span class="gd">-    return 'Loading...';
+</span><span class="gi">+    body = &lt;Spinner /&gt;;
+</span>   } else {
+<span class="gd">-    return (
+-      &lt;&gt;
+-        &lt;p&gt;
+-          You have selected {Object.values(selectedProducts || []).length} products -
+-          Total amount: {total}
+-        &lt;/p&gt;
+-
+-        &lt;ul&gt;
+-          {displayProducts.map((product) =&gt; (
+-            &lt;li key={product.id}&gt;
+-              &lt;input
+-                type="checkbox"
+-                checked={product.selected}
+-                onChange={() =&gt; onSelect(product)} /&gt;
+-              {product.name} - {product.amount}$
+-            &lt;/li&gt;
+-          ))}
+-        &lt;/ul&gt;
+-
+-        &lt;p&gt;
+-          {page &gt; 1 &amp;&amp;
+-            &lt;&gt;
+-              &lt;button onClick={() =&gt; setPage((page) =&gt; page - 1)}&gt;Previous page&lt;/button&gt;
+-              {' | '}
+-            &lt;/&gt;}
+-            Page {page}
+-            {' | '}
+-            &lt;button onClick={() =&gt; setPage((page) =&gt; page + 1)}&gt;Next page&lt;/button&gt;
+-        &lt;/p&gt;
+-        &lt;p&gt;&lt;button onClick={onComplete}&gt;Next step&lt;/button&gt;&lt;/p&gt;
+-      &lt;/&gt;
+-    );
+</span><span class="gi">+    body = (
++      &lt;Products products={displayProducts} onSelect={onSelect} /&gt;
++    );
+</span>   }
+<span class="gi">+  return (
++    &lt;&gt;
++      &lt;SummaryMessage&gt;
++        Selected {selectedProducts.length} products - Amount: {total}$
++      &lt;/SummaryMessage&gt;
++      {body}
++      &lt;Pagination page={page} setPage={setPage} /&gt;
++      &lt;BigButton onClick={onComplete}&gt;Next step&lt;/BigButton&gt;
++    &lt;/&gt;
++  );
+</span> }
+<span class="gi">+ 
++function SummaryMessage({ children }) {
++  return (
++    &lt;div className='my-6 mx-60 p-3 border-4 rounded-lg text-right'&gt;{children}&lt;/div&gt;
++  );
++}
++ 
++function Spinner({ children = 'Loading', interval = 50, length = 8 }) {
++  const [dots, setDots] = useState(0);
++  useEffect(() =&gt; {
++    const intervalId = setInterval(() =&gt; {
++      setDots((dots) =&gt; {
++        dots += 1;
++        while (dots &gt; length) { dots -= length; }
++        return dots;
++      });
++    }, interval)
++    return () =&gt; {
++      clearInterval(intervalId);
++    };
++  }, []);
++
++  return &lt;&gt;{children}{'.'.repeat(dots)}&lt;/&gt;;
++}
++ 
++function Products({ products, onSelect }) {
++  return (
++    &lt;table className='w-full'&gt;
++      &lt;thead&gt;
++        &lt;tr className='bg-slate-50'&gt;
++          &lt;th className='border-2'/&gt;
++          &lt;th className='border-2 text-left'&gt;Name&lt;/th&gt;
++          &lt;th className='border-2 text-left'&gt;Price&lt;/th&gt;
++        &lt;/tr&gt;
++      &lt;/thead&gt;
++      &lt;tbody&gt;
++        {(products || []).map((product) =&gt; (
++          &lt;tr key={product.id}&gt;
++            &lt;td className='border-2'&gt;
++              &lt;input
++                type="checkbox"
++                checked={product.selected}
++                onChange={() =&gt; onSelect(product)} /&gt;
++            &lt;/td&gt;
++            &lt;td className='border-2'&gt;{product.name}&lt;/td&gt;
++            &lt;td className='border-2'&gt;{product.amount}$&lt;/td&gt;
++          &lt;/tr&gt;
++        ))}
++      &lt;/tbody&gt;
++    &lt;/table&gt;
++  );
++}
++ 
++function Pagination({ page, setPage }) {
++  return (
++    &lt;div className='flex gap-x-6'&gt;
++      &lt;div className='flex-grow' /&gt;
++      {page &gt; 1 &amp;&amp; (
++        &lt;div className='flex-0'&gt;
++          &lt;button onClick={() =&gt; setPage((page) =&gt; page - 1)}&gt;previous&lt;/button&gt;
++        &lt;/div&gt;
++      )}
++      &lt;div className='flex-0'&gt;
++        {page}
++      &lt;/div&gt;
++      &lt;div className='flex-0'&gt;
++        &lt;button onClick={() =&gt; setPage((page) =&gt; page + 1)}&gt;next&lt;/button&gt;
++      &lt;/div&gt;
++    &lt;/div&gt;
++  );
++}
++ 
++function BigButton({ onClick, children }) {
++  return (
++    &lt;div className='flex'&gt;
++      &lt;div className='flex-grow' /&gt;
++      &lt;div&gt;
++        &lt;button
++          className='m-2 p-2 bg-green-500 rounded-lg font-bold text-white'
++          onClick={onClick}&gt;
++          {children}
++        &lt;/button&gt;
++      &lt;/div&gt;
++    &lt;/div&gt;
++  );
++}
+</span></code></pre></div></div>
+
+<p>Step 2 is already stateless, so we are “allowed” to add CSS in it:</p>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code> function Step2({ onComplete, address, setAddress }) {
+   return (
+     &lt;&gt;
+<span class="gd">-      &lt;p&gt;
+-        Your address:
+-        &lt;input value={address} onChange={(e) =&gt; setAddress(e.target.value)} /&gt;
+-      &lt;/p&gt;
+</span><span class="gi">+      &lt;div className='my-6 mx-60 p-3 border-4 rounded-lg text-xl flex'&gt;
++        &lt;div className='flex-0'&gt;
++          Address:
++        &lt;/div&gt;
++        &lt;div className='flex-grow pr-8'&gt;
++          &lt;input
++            value={address}
++            onChange={(e) =&gt; setAddress(e.target.value)}
++            className='border-2 ml-6 w-full' /&gt;
++        &lt;/div&gt;
++      &lt;/div&gt;
+</span><span class="gd">-      &lt;p&gt;
+-        &lt;button onClick={onComplete}&gt;Next step&lt;/button&gt;
+-      &lt;/p&gt;
+</span><span class="gi">+      &lt;BigButton onClick={onComplete}&gt;Next step&lt;/BigButton&gt;
+</span>     &lt;/&gt;
+   );
+ }
+</code></pre></div></div>
+
+<p>And finally: Step 3</p>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code> function Step3({ selectedProducts, address }) {
+   // ...
+ 
+   return (
+     &lt;&gt;
+<span class="gd">-      &lt;p&gt;You have selected the following products&lt;/p&gt;
+</span><span class="gi">+      &lt;BigText&gt;You have chosen to order the following products:&lt;/BigText&gt;
+</span><span class="gd">-      &lt;ul&gt;
+-        {Object.values(selectedProducts).map(
+-          (product) =&gt; &lt;li key={product.id}&gt;{product.name} - {product.amount}$&lt;/li&gt;
+-        )}
+-      &lt;/ul&gt;
+</span><span class="gi">+      &lt;Products products={Object.values(selectedProducts)}/&gt;
+</span><span class="gd">-      &lt;p&gt;Your address is: {address}&lt;/p&gt;
+-      &lt;p&gt;The total amount is: {total}$&lt;/p&gt;
+</span><span class="gi">+      &lt;SummaryMessage&gt;
++        &lt;p&gt;Total amount:{total}$&lt;/p&gt;
++        &lt;p&gt;Your address is: {address}&lt;/p&gt;
++      &lt;/SummaryMessage&gt;
+</span><span class="gd">-      {isIdle &amp;&amp; &lt;button onClick={mutate}&gt;Submit order&lt;/button&gt;}
+</span><span class="gi">+      {isIdle &amp;&amp; &lt;BigButton onClick={mutate}&gt;Submit order&lt;/BigButton&gt;}
+</span><span class="gd">-      {isError &amp;&amp; 'Error!!!'}
+</span><span class="gi">+      {isError &amp;&amp; &lt;BigText&gt;Error!!!&lt;/BigText&gt;}
+</span><span class="gd">-      {isLoading &amp;&amp; 'Placing order...'}
+</span><span class="gi">+      {isLoading &amp;&amp; &lt;Spinner&gt;Placing order...&lt;/Spinner&gt;}
+</span><span class="gd">-      {isSuccess &amp;&amp; 'Order placed!!!'}
+</span><span class="gi">+      {isSuccess &amp;&amp; &lt;BigText&gt;Order placed!!!&lt;/BigText&gt;}
+</span>     &lt;/&gt;
+   );
+ }
+
+ function Products({ products, onSelect }) {
+   return (
+     &lt;table className='w-full'&gt;
+       &lt;thead&gt;
+         &lt;tr className='bg-slate-50'&gt;
+<span class="gd">-          &lt;th className='border-2'/&gt;
+</span><span class="gi">+          {onSelect &amp;&amp; &lt;th className='border-2'/&gt;}
+</span>           &lt;th className='border-2 text-left'&gt;Name&lt;/th&gt;
+           &lt;th className='border-2 text-left'&gt;Price&lt;/th&gt;
+         &lt;/tr&gt;
+       &lt;/thead&gt;
+       &lt;tbody&gt;
+         {(products || []).map((product) =&gt; (
+           &lt;tr key={product.id}&gt;
+<span class="gd">-            &lt;td className='border-2'&gt;
+-              &lt;input
+-                type="checkbox"
+-                checked={product.selected}
+-                onChange={() =&gt; onSelect(product)} /&gt;
+-            &lt;/td&gt;
+</span><span class="gi">+            {onSelect &amp;&amp;
++              &lt;td className='border-2'&gt;
++                &lt;input
++                  type="checkbox"
++                  checked={product.selected}
++                  onChange={() =&gt; onSelect(product)} /&gt;
++              &lt;/td&gt;}
+</span>             &lt;td className='border-2'&gt;{product.name}&lt;/td&gt;
+             &lt;td className='border-2'&gt;{product.amount}$&lt;/td&gt;
+           &lt;/tr&gt;
+         ))}
+       &lt;/tbody&gt;
+     &lt;/table&gt;
+   );
+ }
+<span class="gi">+ 
++function BigText({ children }) {
++  return &lt;div className='text-xl p-4'&gt;{children}&lt;/div&gt;;
++}
+</span></code></pre></div></div>
+
+<p>Step 3 is interesting. We are already seeing some stateless components that are
+suitable for re-use, like <code class="language-plaintext highlighter-rouge">SummaryMessage</code>, <code class="language-plaintext highlighter-rouge">Spinner</code> and <code class="language-plaintext highlighter-rouge">BigButton</code>. What’s
+more, when it became evident that we would need a table for the products again,
+it didn’t make sense to make another, non-editable, product table component.
+The existing component could be modified so that if the select callback is
+missing, the leftmost column doesn’t get rendered. While this makes the
+component less dumb, the conditional logic is only applied on its props. It
+continues to not have state. This also makes some sense even if you read this
+component in isolation: If there is no callback function to notify that the
+products were un/selected, it doesn’t make sense to render the UI elements that
+make this possible.</p>
+
+<p>The whole application can be viewed
+<a href="https://codesandbox.io/s/tailwind-css-and-react-forked-hi13df">here</a>. Behold
+my amazing UI design skills!!!</p>
+
+<p>We can verify that my guideline was followed since any components that has
+state (either via <code class="language-plaintext highlighter-rouge">useState</code>, <code class="language-plaintext highlighter-rouge">useQuery</code> or <code class="language-plaintext highlighter-rouge">useMutation</code>) doesn’t have a
+<code class="language-plaintext highlighter-rouge">className</code> within it and any components that have <code class="language-plaintext highlighter-rouge">className</code> within them
+don’t have any state. My hope is that by following these guidelines, both
+state-ful and style-ful components are easier to read. Also, if you look at the
+state-ful components, they keep almost the same logic and structure as they had
+before we started adding styles.</p>
+
+  </div><a class="u-url" href="/programming/react/2023/02/19/only-dumb-components-should-have-css-in-react.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">kbairak&#39;s blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">kbairak&#39;s blog</li><li><a class="u-email" href="mailto:ikijob@gmail.com">ikijob@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/kbairak"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">kbairak</span></a></li><li><a href="https://www.twitter.com/kbairak"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">kbairak</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>Mostly programming tips and tutorials, mostly in Python. But who knows? I may rumble about other things as well.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
