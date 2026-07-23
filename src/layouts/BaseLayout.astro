@@ -1,0 +1,73 @@
+---
+export interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title = "kbairak", description = "Konstantinos Bairaktaris" } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <style>
+      :root {
+        --bg: #ffffff;
+        --fg: #1a1a1a;
+        --muted: #6b7280;
+        --accent: #2563eb;
+        --accent-hover: #1d4ed8;
+        --border: #e5e7eb;
+        --card-bg: #f9fafb;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: var(--bg);
+        color: var(--fg);
+        line-height: 1.7;
+        padding: 0 1rem;
+      }
+      a { color: var(--accent); text-decoration: none; }
+      a:visited { color: var(--accent); }
+      a:hover { color: var(--accent-hover); text-decoration: underline; }
+      img { max-width: 100%; height: auto; }
+      pre, code {
+        font-family: "SF Mono", "Fira Code", "Fira Mono", monospace;
+        font-size: 0.9em;
+      }
+      pre {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 1rem;
+        overflow-x: auto;
+      }
+      code { background: var(--card-bg); padding: 0.15em 0.3em; border-radius: 3px; }
+      pre code { background: none; padding: 0; }
+      blockquote {
+        border-left: 3px solid var(--accent);
+        padding-left: 1rem;
+        color: var(--muted);
+        margin: 1rem 0;
+      }
+      h1, h2, h3, h4 { line-height: 1.3; margin-top: 2rem; margin-bottom: 0.5rem; }
+      h1 { font-size: 2rem; }
+      h2 { font-size: 1.5rem; }
+      h3 { font-size: 1.25rem; }
+      p, ul, ol { margin-bottom: 1rem; }
+      ul, ol { padding-left: 1.5rem; }
+      hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+      .container { max-width: 720px; margin: 0 auto; padding: 2rem 0; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <slot />
+    </div>
+  </body>
+</html>

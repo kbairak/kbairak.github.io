@@ -1,0 +1,78 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Nav from "../components/Nav.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import BlogList from "../components/BlogList.astro";
+import { getCollection } from "astro:content";
+
+const posts = await getCollection("blog");
+posts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const recentPosts = posts.slice(0, 5);
+---
+
+<BaseLayout title="kbairak">
+  <Nav />
+
+  <section class="hero">
+    <h1>Konstantinos Bairaktaris</h1>
+    <p class="tagline">Programmer, husband, father of two.</p>
+    <p class="links">
+      <a href="https://github.com/kbairak">GitHub</a>
+      <a href="mailto:ikijob@gmail.com">Email</a>
+    </p>
+  </section>
+
+  <section>
+    <h2>Recent posts</h2>
+    <BlogList posts={recentPosts} />
+    <p class="all-posts"><a href="/blog">All posts &rarr;</a></p>
+  </section>
+
+  <section>
+    <h2>Projects</h2>
+    <div class="grid">
+      <ProjectCard
+        title="Space Combat"
+        href="https://kbairak.net/spacecombat/"
+        description="A space combat game"
+      />
+      <ProjectCard
+        title="Dice"
+        href="https://kbairak.net/dice/"
+        description="Dice rolling app"
+      />
+      <ProjectCard
+        title="FairBite"
+        href="https://kbairak.net/FairBite/"
+        description="A Protocol for Fair Food Delivery"
+      />
+      <ProjectCard
+        title="pipepy"
+        href="https://github.com/kbairak/pipepy"
+        description="Python library for invoking shell commands"
+      />
+      <ProjectCard
+        title="ColumnTags.nvim"
+        href="https://github.com/kbairak/ColumnTags.nvim"
+        description="Miller Columns navigation plugin for Neovim"
+      />
+      <ProjectCard
+        title="webmq"
+        href="https://github.com/kbairak/webmq"
+        description="Real-time messaging with WebSockets and RabbitMQ"
+      />
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    margin-bottom: 3rem;
+  }
+  .hero h1 { font-size: 2.5rem; margin: 0 0 0.5rem; }
+  .tagline { color: var(--muted); font-size: 1.1rem; margin-bottom: 0.5rem; }
+  .links { display: flex; gap: 1rem; }
+  .links a { font-size: 0.95rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+  .all-posts { margin-top: 0.5rem; font-size: 0.95rem; }
+</style>
