@@ -26,6 +26,12 @@ export const categories: Category[] = [
         site: "https://kbairak.net/djsonapi/",
       },
       {
+        title: "djoutbox",
+        description: "Transactional outbox pattern for Django + PostgreSQL + RabbitMQ",
+        repo: "https://github.com/kbairak/djoutbox",
+        site: "https://kbairak.net/djoutbox/",
+      },
+      {
         title: "outbox",
         description: "Transactional outbox pattern for Postgres and RabbitMQ",
         repo: "https://github.com/kbairak/outbox",
