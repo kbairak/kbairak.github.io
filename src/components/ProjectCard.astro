@@ -1,17 +1,22 @@
 ---
 export interface Props {
   title: string;
-  href: string;
   description: string;
+  repo: string;
+  site?: string;
 }
 
-const { title, href, description } = Astro.props;
+const { title, description, repo, site } = Astro.props;
 ---
 
-<a class="card" href={href}>
+<div class="card">
   <h3>{title}</h3>
   <p>{description}</p>
-</a>
+  <p class="links">
+    {site && <a href={site}>Site &rarr;</a>}
+    {site ? <a href={repo}>Repo &rarr;</a> : <a href={repo}>GitHub &rarr;</a>}
+  </p>
+</div>
 
 <style>
   .card {
@@ -22,7 +27,9 @@ const { title, href, description } = Astro.props;
     color: var(--fg);
     transition: border-color 0.15s;
   }
-  .card:hover { border-color: var(--accent); text-decoration: none; }
+  .card:hover { border-color: var(--accent); }
   .card h3 { margin: 0 0 0.35rem; font-size: 1.1rem; }
   .card p { margin: 0; font-size: 0.9rem; color: var(--muted); }
+  .links { margin-top: 0.5rem; display: flex; gap: 0.75rem; }
+  .links a { font-size: 0.85rem; }
 </style>

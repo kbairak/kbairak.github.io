@@ -2,58 +2,35 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Nav from "../components/Nav.astro";
 import ProjectCard from "../components/ProjectCard.astro";
+import { categories } from "../data/projects";
+
+function slugify(name: string) {
+  return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
 ---
 
 <BaseLayout title="Projects — kbairak">
   <Nav />
   <h1>Projects</h1>
-  <div class="grid">
-    <ProjectCard
-      title="djsonapi"
-      href="https://kbairak.net/djsonapi/"
-      description="{json:api} server toolkit for Django"
-    />
-    <ProjectCard
-      title="Space Combat"
-      href="https://kbairak.net/spacecombat/"
-      description="A space combat game"
-    />
-    <ProjectCard
-      title="Dice"
-      href="https://kbairak.net/dice/"
-      description="Dice rolling app"
-    />
-    <ProjectCard
-      title="FairBite"
-      href="https://kbairak.net/FairBite/"
-      description="A Protocol for Fair Food Delivery"
-    />
-    <ProjectCard
-      title="pipepy"
-      href="https://github.com/kbairak/pipepy"
-      description="Python library for invoking and interacting with shell commands"
-    />
-    <ProjectCard
-      title="ColumnTags.nvim"
-      href="https://github.com/kbairak/ColumnTags.nvim"
-      description="Miller Columns navigation plugin for Neovim"
-    />
-    <ProjectCard
-      title="webmq"
-      href="https://github.com/kbairak/webmq"
-      description="Real-time messaging framework with WebSockets and RabbitMQ"
-    />
-    <ProjectCard
-        title="pjst"
-      href="https://github.com/kbairak/pjst"
-      description="Python {json:api} Server Toolkit"
-    />
-    <ProjectCard
-      title="ohk"
-      href="https://github.com/kbairak/ohk"
-      description="Interactive alternative to grep and awk"
-    />
-  </div>
+  {
+    categories.map((category) => {
+      return (
+        <>
+          <h2 id={slugify(category.name)}>{category.name}</h2>
+        <div class="grid">
+          {category.projects.map((project) => (
+            <ProjectCard
+              title={project.title}
+              description={project.description}
+              repo={project.repo}
+              site={project.site}
+            />
+          ))}
+        </div>
+      </>
+    );
+  })
+}
 </BaseLayout>
 
 <style>
