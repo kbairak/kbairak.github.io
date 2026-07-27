@@ -18,6 +18,7 @@ export const categories: Category[] = [
         title: "pipepy/pymake",
         description: "Python library for invoking and interacting with shell commands",
         repo: "https://github.com/kbairak/pipepy",
+        site: "https://kbairak.net/pipepy/",
       },
       {
         title: "djsonapi",
