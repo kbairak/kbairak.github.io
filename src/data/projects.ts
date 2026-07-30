@@ -56,6 +56,7 @@ export const categories: Category[] = [
         title: "webmq",
         description: "Real-time messaging framework with WebSockets and RabbitMQ",
         repo: "https://github.com/kbairak/webmq",
+        site: "https://kbairak.net/webmq/",
       },
       {
         title: "domstatejsx",
