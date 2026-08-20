@@ -62,6 +62,7 @@ export const categories: Category[] = [
         title: "domstatejsx",
         description: "JSX and state-in-DOM web library",
         repo: "https://github.com/kbairak/domstatejsx",
+        site: "https://kbairak.net/domstatejsx/",
       },
       {
         title: "Space Combat",
