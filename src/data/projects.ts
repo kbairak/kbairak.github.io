@@ -79,6 +79,16 @@ export const categories: Category[] = [
     ],
   },
   {
+    name: "Go",
+    projects: [
+      {
+        title: "reverse-terminal",
+        description: "Terminal that pins the prompt to the top and grows history downward",
+        repo: "https://github.com/kbairak/rt",
+      },
+    ],
+  },
+  {
     name: "(Neo)Vim Plugins",
     projects: [
       {
