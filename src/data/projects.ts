@@ -42,11 +42,6 @@ export const categories: Category[] = [
         description: "Symbolic field relationships with automatic inversion",
         repo: "https://github.com/kbairak/symfields",
       },
-      {
-        title: "ohk",
-        description: "Interactive alternative to grep and awk",
-        repo: "https://github.com/kbairak/ohk",
-      },
     ],
   },
   {
@@ -81,6 +76,11 @@ export const categories: Category[] = [
   {
     name: "Go",
     projects: [
+      {
+        title: "ohk",
+        description: "Interactive alternative to grep and awk",
+        repo: "https://github.com/kbairak/ohk",
+      },
       {
         title: "reverse-terminal",
         description: "Terminal that pins the prompt to the top and grows history downward",
