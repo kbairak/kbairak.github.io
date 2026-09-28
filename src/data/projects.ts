@@ -77,6 +77,11 @@ export const categories: Category[] = [
     name: "Go",
     projects: [
       {
+        title: "flagpick",
+        description: "TUI for building and running complex CLI commands",
+        repo: "https://github.com/kbairak/flagpick",
+      },
+      {
         title: "ohk",
         description: "Interactive alternative to grep and awk",
         repo: "https://github.com/kbairak/ohk",
