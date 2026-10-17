@@ -16,7 +16,8 @@ export const categories: Category[] = [
     projects: [
       {
         title: "pipepy/pymake",
-        description: "Python library for invoking and interacting with shell commands",
+        description:
+          "Python library for invoking and interacting with shell commands",
         repo: "https://github.com/kbairak/pipepy",
         site: "https://kbairak.net/pipepy/",
       },
@@ -28,7 +29,8 @@ export const categories: Category[] = [
       },
       {
         title: "djoutbox",
-        description: "Transactional outbox pattern for Django + PostgreSQL + RabbitMQ",
+        description:
+          "Transactional outbox pattern for Django + PostgreSQL + RabbitMQ",
         repo: "https://github.com/kbairak/djoutbox",
         site: "https://kbairak.net/djoutbox/",
       },
@@ -49,7 +51,8 @@ export const categories: Category[] = [
     projects: [
       {
         title: "webmq",
-        description: "Real-time messaging framework with WebSockets and RabbitMQ",
+        description:
+          "Real-time messaging framework with WebSockets and RabbitMQ",
         repo: "https://github.com/kbairak/webmq",
         site: "https://kbairak.net/webmq/",
       },
@@ -66,7 +69,7 @@ export const categories: Category[] = [
         site: "https://kbairak.net/spacecombat/",
       },
       {
-        title: "Dice",
+        title: "Dice (NSFW)",
         description: "Dice rolling app",
         repo: "https://github.com/kbairak/dice",
         site: "https://kbairak.net/dice/",
@@ -88,7 +91,8 @@ export const categories: Category[] = [
       },
       {
         title: "reverse-terminal",
-        description: "Terminal that pins the prompt to the top and grows history downward",
+        description:
+          "Terminal that pins the prompt to the top and grows history downward",
         repo: "https://github.com/kbairak/rt",
       },
     ],
